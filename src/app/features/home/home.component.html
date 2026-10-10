@@ -1,0 +1,150 @@
+<main id="main-content">
+
+  <!-- ─── HERO ─── -->
+  <section
+    class="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden px-6 pt-14"
+    aria-label="Sección de bienvenida"
+  >
+    <!-- Gradient background -->
+    <div
+      class="absolute inset-0"
+      style="background: radial-gradient(ellipse at 50% 0%, rgba(100,40,0,0.8) 0%, rgba(30,10,0,0.9) 40%, #0F0F0F 100%);"
+      aria-hidden="true"
+    ></div>
+
+    <!-- Decorative glow -->
+    <div
+      class="absolute top-1/4 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full blur-3xl pointer-events-none"
+      style="background: radial-gradient(circle, rgba(240,120,0,0.15) 0%, transparent 70%);"
+      aria-hidden="true"
+    ></div>
+
+    <!-- Content -->
+    <div class="relative z-10 flex flex-col items-center text-center max-w-sm w-full">
+      <!-- Logo -->
+      <div class="mb-6 w-40 h-40 flex items-center justify-center">
+        @if (!logoError()) {
+          <img
+            src="images/logo-burger-real.webp"
+            alt="Logo Burger Real"
+            class="w-full h-full object-contain drop-shadow-2xl"
+            (error)="logoError.set(true)"
+          />
+        } @else {
+          <span class="font-display text-8xl" aria-hidden="true">🍔</span>
+        }
+      </div>
+
+      <!-- Brand name -->
+      <h1 class="font-display text-6xl text-brand-white tracking-wider leading-none mb-2">
+        BURGER REAL
+      </h1>
+
+      <!-- Tagline -->
+      <p class="font-heading italic text-2xl text-brand-orange mb-3">
+        Sabor Casero
+      </p>
+
+      <!-- Support text -->
+      <p class="font-body text-sm text-brand-cream mb-10 opacity-80">
+        Pedí tu hamburguesa y retirá en local
+      </p>
+
+      <!-- CTA -->
+      <a
+        routerLink="/menu"
+        class="font-heading font-semibold text-lg px-12 py-4 rounded-xl transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-brand-orange focus:ring-offset-2 focus:ring-offset-brand-dark"
+        style="background: #F07800; color: #0F0F0F; box-shadow: 0 4px 24px rgba(240,120,0,0.35);"
+        aria-label="Ver el menú completo"
+      >
+        Ver Menú
+      </a>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-40" aria-hidden="true">
+      <span class="w-0.5 h-8 rounded-full" style="background: linear-gradient(to bottom, #F07800, transparent);"></span>
+    </div>
+  </section>
+
+  <!-- ─── BENEFITS ─── -->
+  <section
+    class="px-4 py-12"
+    style="background: #1A1A1A;"
+    aria-label="Por qué elegirnos"
+  >
+    <h2 class="font-display text-3xl text-center text-brand-white tracking-wide mb-8">
+      ¿Por qué Burger Real?
+    </h2>
+
+    <ul class="grid grid-cols-3 gap-3 max-w-sm mx-auto" role="list">
+      @for (benefit of benefits; track benefit.title) {
+        <li class="flex flex-col items-center text-center gap-2 p-3 rounded-xl" style="background: #242424;">
+          <div class="w-10 h-10 flex items-center justify-center rounded-full" style="background: rgba(240,120,0,0.12);">
+            @switch (benefit.icon) {
+              @case ('flame') {
+                <svg lucideFlame class="w-5 h-5 text-brand-orange" aria-hidden="true"></svg>
+              }
+              @case ('star') {
+                <svg lucideStar class="w-5 h-5 text-brand-orange" aria-hidden="true"></svg>
+              }
+              @case ('zap') {
+                <svg lucideZap class="w-5 h-5 text-brand-orange" aria-hidden="true"></svg>
+              }
+            }
+          </div>
+          <p class="font-heading font-semibold text-xs text-brand-white leading-tight">{{ benefit.title }}</p>
+          <p class="font-body text-[10px] text-brand-cream leading-snug opacity-80">{{ benefit.desc }}</p>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <!-- ─── CATEGORY SHORTCUTS ─── -->
+  <section
+    class="py-10"
+    style="background: #0F0F0F;"
+    aria-label="Categorías del menú"
+  >
+    <h2 class="font-display text-3xl text-center text-brand-white tracking-wide mb-6 px-4">
+      Nuestro Menú
+    </h2>
+
+    <!-- Horizontal scroll snap -->
+    <div
+      class="flex gap-3 px-4 overflow-x-auto scroll-smooth pb-3"
+      style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;"
+      role="list"
+      aria-label="Categorías disponibles"
+    >
+      @for (cat of categories; track cat.key) {
+        <a
+          [routerLink]="['/menu']"
+          [queryParams]="{ cat: cat.key }"
+          class="flex-shrink-0 flex flex-col items-center gap-3 p-5 rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:border-brand-orange focus:outline-none focus:ring-2 focus:ring-brand-orange"
+          style="background: #1A1A1A; border-color: #2A2A2A; scroll-snap-align: start; min-width: calc(33.333% - 8px); flex: 0 0 calc(33.333% - 8px); box-shadow: 0 2px 12px rgba(0,0,0,0.3);"
+          role="listitem"
+          [attr.aria-label]="'Ver ' + cat.label"
+        >
+          <span class="text-4xl" aria-hidden="true">{{ cat.emoji }}</span>
+          <span class="font-heading font-semibold text-sm text-brand-white">{{ cat.label }}</span>
+          <div class="flex items-center gap-1 text-brand-orange">
+            <span class="font-body text-xs">Ver</span>
+            <svg lucideArrowRight class="w-3.5 h-3.5" aria-hidden="true"></svg>
+          </div>
+        </a>
+      }
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer
+    class="py-8 text-center border-t"
+    style="background: #0A0A0A; border-color: #1A1A1A;"
+    role="contentinfo"
+  >
+    <p class="font-heading text-lg text-brand-orange tracking-wide mb-1">BURGER REAL</p>
+    <p class="font-body text-xs text-brand-cream opacity-50">Sabor Casero — {{ currentYear }}</p>
+  </footer>
+
+</main>

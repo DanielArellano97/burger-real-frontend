@@ -1,0 +1,15 @@
+<div class="min-h-screen bg-brand-dark">
+  <!-- Persistent navbar -->
+  <app-navbar />
+
+  <!-- Page content (padded top to clear fixed navbar) -->
+  <div class="pt-14">
+    <router-outlet />
+  </div>
+
+  <!-- Cart drawer (global overlay + panel) -->
+  <app-cart-drawer />
+
+  <!-- Toast notifications -->
+  <app-toast />
+</div>

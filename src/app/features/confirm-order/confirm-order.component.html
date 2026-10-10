@@ -1,0 +1,313 @@
+<div class="min-h-screen pb-8" style="background: #0F0F0F;">
+
+  <!-- Header -->
+  <div class="px-4 pt-6 pb-4">
+    <button (click)="goBack()" class="flex items-center gap-1 mb-4" style="color: #888;">
+      <svg lucideChevronLeft class="w-4 h-4" aria-hidden="true"></svg>
+      <span class="font-body text-sm">Volver al menú</span>
+    </button>
+    <h1 class="font-display text-3xl text-brand-white">Confirmar Pedido</h1>
+    <p class="font-body text-sm mt-1" style="color: #888;">Revisá tu pedido y completá tus datos</p>
+  </div>
+
+  <!-- Bloque 0: Resumen del pedido -->
+  <section class="mx-4 mb-4 rounded-xl overflow-hidden" style="background: #1A1A1A; border: 1px solid #2A2A2A;">
+    <div class="px-4 py-3 border-b flex items-center justify-center" style="border-color: #2A2A2A; background: #111;">
+      <p
+        class="font-heading font-bold text-xs tracking-widest uppercase"
+        style="color: #F07800; letter-spacing: 0.15em;"
+      >Tu Pedido</p>
+    </div>
+    <div class="px-4 py-3 space-y-2">
+      @for (item of cartService.cartItems(); track item.cartItemId) {
+        <div class="flex justify-between items-start">
+          <div class="flex-1">
+            <p class="font-heading text-sm text-brand-white">
+              {{ item.quantity }}x {{ item.product.name }}
+              @if (item.selectedVariant) {
+                <span style="color: #F07800;"> — {{ item.selectedVariant.shortName }}</span>
+              }
+            </p>
+          </div>
+          <p class="font-heading font-bold text-sm text-brand-orange ml-3">
+            {{ formatPrice(item.unitPrice * item.quantity) }}
+          </p>
+        </div>
+      }
+    </div>
+    <div class="px-4 py-3 border-t flex justify-between items-center" style="border-color: #2A2A2A;">
+      <span class="font-heading text-sm text-brand-cream">Total</span>
+      <span class="font-display text-2xl text-brand-orange">{{ formatPrice(cartService.totalPrice()) }}</span>
+    </div>
+  </section>
+
+  <!-- Bloque A: Datos de contacto -->
+  <section class="mx-4 mb-4 rounded-xl overflow-hidden" style="background: #1A1A1A; border: 1px solid #2A2A2A;">
+    <div class="px-4 py-3 border-b" style="border-color: #2A2A2A;">
+      <p class="font-heading font-semibold text-sm text-brand-white">👤 Datos de contacto</p>
+    </div>
+    <div class="px-4 py-4 space-y-3">
+      <div>
+        <label class="font-body text-xs mb-1 block" style="color: #888;">Nombre de quien recibe *</label>
+        <input
+          type="text"
+          [value]="name()"
+          (input)="name.set(sanitize($any($event.target).value)); saveFormToSession()"
+          placeholder="Ej: Juan Pérez"
+          class="w-full px-3 py-2.5 rounded-lg font-body text-sm text-brand-white outline-none transition-colors"
+          style="background: #242424; border: 1px solid #2A2A2A;"
+          (focus)="$any($event.target).style.borderColor='#F07800'"
+          (blur)="$any($event.target).style.borderColor='#2A2A2A'"
+        />
+        @if (name().length > 0 && !isNameValid()) {
+          <p class="font-body text-xs mt-1" style="color: #f87171;">
+            Solo se permiten letras y espacios
+          </p>
+        }
+      </div>
+      <div>
+        <label class="font-body text-xs mb-1 block" style="color: #888;">Teléfono de contacto *</label>
+        <input
+          type="tel"
+          [value]="phone()"
+          (input)="phone.set($any($event.target).value); saveFormToSession()"
+          placeholder="Ej: +56 9 1234 5678"
+          class="w-full px-3 py-2.5 rounded-lg font-body text-sm text-brand-white outline-none transition-colors"
+          style="background: #242424; border: 1px solid #2A2A2A;"
+          (focus)="$any($event.target).style.borderColor='#F07800'"
+          (blur)="$any($event.target).style.borderColor='#2A2A2A'"
+        />
+        @if (phone().length > 3 && !isPhoneValid()) {
+          <p class="font-body text-xs mt-1" style="color: #f87171;">
+            Ingresa un número chileno válido (ej: +569 1234 5678)
+          </p>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Bloque B: Método de entrega -->
+  <section class="mx-4 mb-4 rounded-xl overflow-hidden" style="background: #1A1A1A; border: 1px solid #2A2A2A;">
+    <div class="px-4 py-3 border-b" style="border-color: #2A2A2A;">
+      <p class="font-heading font-semibold text-sm text-brand-white">🚀 Método de entrega</p>
+    </div>
+    <div class="px-4 py-4">
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        <button
+          (click)="deliveryMethod.set('pickup'); saveFormToSession()"
+          class="flex flex-col items-center justify-center gap-1 py-3 rounded-lg transition-colors font-heading text-sm font-semibold"
+          [style.background]="deliveryMethod() === 'pickup' ? '#F07800' : '#242424'"
+          [style.color]="deliveryMethod() === 'pickup' ? '#0F0F0F' : '#F0F0F0'"
+          [style.border]="deliveryMethod() === 'pickup' ? '1px solid #F07800' : '1px solid #2A2A2A'"
+        >
+          <span>🏢</span>
+          <span>Retiro en Local</span>
+        </button>
+        <button
+          (click)="deliveryMethod.set('delivery'); gpsCoords.set(null); gpsStatus.set('idle'); saveFormToSession()"
+          class="flex flex-col items-center justify-center gap-1 py-3 rounded-lg transition-colors font-heading text-sm font-semibold"
+          [style.background]="deliveryMethod() === 'delivery' ? '#F07800' : '#242424'"
+          [style.color]="deliveryMethod() === 'delivery' ? '#0F0F0F' : '#F0F0F0'"
+          [style.border]="deliveryMethod() === 'delivery' ? '1px solid #F07800' : '1px solid #2A2A2A'"
+        >
+          <span>🛵</span>
+          <span>Delivery</span>
+        </button>
+      </div>
+
+      @if (deliveryMethod() === 'delivery') {
+        <div class="space-y-3">
+          <!-- Botón GPS -->
+          <button
+            (click)="requestGPS()"
+            [disabled]="gpsStatus() === 'loading'"
+            class="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg font-heading font-semibold text-sm transition-all border disabled:opacity-50"
+            style="background: #242424; color: #F0F0F0; border-color: #2A2A2A;"
+          >
+            @if (gpsStatus() === 'loading') {
+              <span>Obteniendo ubicación...</span>
+            } @else if (gpsStatus() === 'success') {
+              <span style="color: #4ade80;">📍 Ubicación capturada correctamente</span>
+            } @else if (gpsStatus() === 'error') {
+              <span style="color: #f87171;">⚠️ No se pudo obtener la ubicación</span>
+            } @else {
+              <span>📍 Fijar ubicación exacta con GPS</span>
+            }
+          </button>
+
+          <!-- Campo de dirección — siempre visible cuando delivery está seleccionado -->
+          <div>
+            <label class="font-body text-xs mb-1 block" style="color: #888;">
+              Dirección de entrega *
+            </label>
+            <input
+              type="text"
+              [value]="address()"
+              (input)="address.set(sanitize($any($event.target).value)); saveFormToSession()"
+              placeholder="Ej: Av. Los Aromos 123, Depto 4B — Edificio azul, saldré a buscar"
+              class="w-full px-3 py-2.5 rounded-lg font-body text-sm text-brand-white outline-none"
+              style="background: #242424; border: 1px solid #2A2A2A;"
+              (focus)="$event.target.style.borderColor='#F07800'"
+              (blur)="$event.target.style.borderColor='#2A2A2A'"
+            />
+          </div>
+
+          @if (gpsStatus() === 'success') {
+            <p class="font-body text-xs" style="color: #4ade80;">
+              📍 Ubicación GPS capturada. Podés agregar referencias en el campo de arriba.
+            </p>
+          }
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Bloque C: Método de pago -->
+  <section class="mx-4 mb-4 rounded-xl overflow-hidden" style="background: #1A1A1A; border: 1px solid #2A2A2A;">
+    <div class="px-4 py-3 border-b" style="border-color: #2A2A2A;">
+      <p class="font-heading font-semibold text-sm text-brand-white">💳 Método de pago</p>
+    </div>
+    <div class="px-4 py-4">
+      <div class="grid grid-cols-2 gap-2 mb-4">
+        <button
+          (click)="paymentMethod.set('transfer'); saveFormToSession()"
+          class="flex flex-col items-center justify-center gap-1 py-3 rounded-lg transition-colors font-heading text-sm font-semibold"
+          [style.background]="paymentMethod() === 'transfer' ? '#F07800' : '#242424'"
+          [style.color]="paymentMethod() === 'transfer' ? '#0F0F0F' : '#F0F0F0'"
+          [style.border]="paymentMethod() === 'transfer' ? '1px solid #F07800' : '1px solid #2A2A2A'"
+        >
+          <span>💳</span>
+          <span>Transferencia</span>
+        </button>
+        <button
+          (click)="paymentMethod.set('cash'); saveFormToSession()"
+          class="flex flex-col items-center justify-center gap-1 py-3 rounded-lg transition-colors font-heading text-sm font-semibold"
+          [style.background]="paymentMethod() === 'cash' ? '#F07800' : '#242424'"
+          [style.color]="paymentMethod() === 'cash' ? '#0F0F0F' : '#F0F0F0'"
+          [style.border]="paymentMethod() === 'cash' ? '1px solid #F07800' : '1px solid #2A2A2A'"
+        >
+          <span>💵</span>
+          <span>Efectivo</span>
+        </button>
+      </div>
+
+      @if (paymentMethod() === 'transfer') {
+        <div class="rounded-lg p-4 space-y-2" style="background: #242424; border: 1px solid #2A2A2A;">
+          <p class="font-heading font-semibold text-sm text-brand-white mb-3">Datos de transferencia</p>
+          <div class="space-y-1.5">
+            <p class="font-body text-sm" style="color: #F0DCC8;"><span style="color: #888;">Banco:</span> {{ bankDetails.bank }}</p>
+            <p class="font-body text-sm" style="color: #F0DCC8;"><span style="color: #888;">Tipo:</span> {{ bankDetails.accountType }}</p>
+            <p class="font-body text-sm" style="color: #F0DCC8;"><span style="color: #888;">Nombre:</span> {{ bankDetails.ownerName }}</p>
+            <p class="font-body text-sm" style="color: #F0DCC8;"><span style="color: #888;">RUT:</span> {{ bankDetails.rut }}</p>
+            <p class="font-body text-sm" style="color: #F0DCC8;"><span style="color: #888;">Email:</span> {{ bankDetails.email }}</p>
+            <div class="flex items-center justify-between pt-1">
+              <p class="font-body text-sm" style="color: #F0DCC8;">
+                <span style="color: #888;">N° Cuenta:</span> {{ bankDetails.accountNumber }}
+              </p>
+              <button
+                (click)="copyAccountNumber()"
+                class="flex items-center gap-1 px-2.5 py-1 rounded-lg font-body text-xs transition-all"
+                [style.background]="copied() ? '#166534' : '#2A2A2A'"
+                [style.color]="copied() ? '#4ade80' : '#F07800'"
+              >
+                @if (copied()) {
+                  <svg lucideCheck class="w-3 h-3" aria-hidden="true"></svg>
+                  <span>¡Copiado!</span>
+                } @else {
+                  <svg lucideCopy class="w-3 h-3" aria-hidden="true"></svg>
+                  <span>Copiar datos</span>
+                }
+              </button>
+            </div>
+          </div>
+          <p class="font-body text-xs mt-3 leading-relaxed" style="color: #F0DCC8;">
+            ⚠️ Una vez enviado el comprobante de pago por WhatsApp se agendará tu orden.
+          </p>
+        </div>
+      }
+
+      @if (paymentMethod() === 'cash') {
+        <div class="space-y-3 mt-3">
+          <!-- Campo monto -->
+          <div>
+            <label class="font-body text-xs mb-1 block" style="color: #888;">
+              ¿Con cuánto vas a pagar? *
+            </label>
+            <input
+              type="number"
+              [value]="cashAmount()"
+              (input)="cashAmount.set($any($event.target).value)"
+              [placeholder]="'Monto mínimo: ' + formatPrice(cartService.totalPrice())"
+              class="w-full px-3 py-2.5 rounded-lg font-body text-sm text-brand-white outline-none"
+              style="background: #242424; border: 1px solid #2A2A2A;"
+              (focus)="$event.target.style.borderColor='#F07800'"
+              (blur)="$event.target.style.borderColor='#2A2A2A'"
+              min="0"
+            />
+            @if (cashAmount().length > 0 && !isCashAmountValid()) {
+              <p class="font-body text-xs mt-1" style="color: #f87171;">
+                El monto debe ser igual o mayor al total del pedido ({{ formatPrice(cartService.totalPrice()) }})
+              </p>
+            }
+          </div>
+
+          <!-- Vuelto calculado -->
+          @if (change() !== null && change()! > 0) {
+            <div class="flex items-center justify-between rounded-lg px-3 py-2.5" style="background: #111;">
+              <span class="font-body text-sm" style="color: #888;">Vuelto estimado</span>
+              <span class="font-heading font-bold text-base" style="color: #4ade80;">{{ formatPrice(change()!) }}</span>
+            </div>
+          }
+          @if (change() === 0) {
+            <div class="rounded-lg px-3 py-2.5" style="background: #111;">
+              <p class="font-body text-sm text-center" style="color: #4ade80;">Pago justo — sin vuelto</p>
+            </div>
+          }
+
+          <!-- Aviso mixto -->
+          <div class="rounded-lg p-3" style="background: rgba(240,120,0,0.08); border: 1px solid rgba(240,120,0,0.2);">
+            <p class="font-body text-xs leading-relaxed" style="color: #F0DCC8;">
+              Aceptamos también pago mixto efectivo/transferencia al momento de la entrega.
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Bloque D: Notas para la cocina -->
+  <section class="mx-4 mb-6 rounded-xl overflow-hidden" style="background: #1A1A1A; border: 1px solid #2A2A2A;">
+    <div class="px-4 py-3 border-b" style="border-color: #2A2A2A;">
+      <p class="font-heading font-semibold text-sm text-brand-white">👨‍🍳 Notas para la cocina</p>
+    </div>
+    <div class="px-4 py-4">
+      <textarea
+        [value]="notes()"
+        (input)="notes.set(sanitize($any($event.target).value)); saveFormToSession()"
+        placeholder="Ej: Sin sal en las papas, medallón bien cocido, sin salsa..."
+        rows="3"
+        class="w-full px-3 py-2.5 rounded-lg font-body text-sm text-brand-white outline-none transition-colors resize-none"
+        style="background: #242424; border: 1px solid #2A2A2A;"
+        (focus)="$any($event.target).style.borderColor='#F07800'"
+        (blur)="$any($event.target).style.borderColor='#2A2A2A'"
+      ></textarea>
+    </div>
+  </section>
+
+  <!-- Botón de confirmación final -->
+  <div class="px-4 pb-8">
+    <button
+      (click)="confirmOrder()"
+      [disabled]="!isFormValid()"
+      class="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-heading font-bold text-lg transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+      style="background: #25D366; color: #ffffff;"
+      aria-label="Confirmar y enviar pedido por WhatsApp"
+    >
+      <svg viewBox="0 0 24 24" class="w-5 h-5" fill="currentColor" aria-hidden="true">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      Confirmar y Enviar por WhatsApp
+    </button>
+  </div>
+
+</div>

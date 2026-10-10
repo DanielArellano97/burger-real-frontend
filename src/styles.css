@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-orange: #F07800;
+  --color-brand-orange-2: #DC7814;
+  --color-brand-dark: #0F0F0F;
+  --color-brand-surface: #1A1A1A;
+  --color-brand-surface-2: #242424;
+  --color-brand-white: #F0F0F0;
+  --color-brand-cream: #F0DCC8;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-heading: 'Barlow Condensed', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+@keyframes cartBadgePop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+@keyframes drawerIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 0.7; }
+}
+
+@keyframes quantityIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.cart-badge-pop {
+  animation: cartBadgePop 0.3s ease-out;
+}
+
+.drawer-slide-in {
+  animation: drawerIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.drawer-slide-out {
+  animation: drawerOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes drawerOut {
+  from { transform: translateX(0); }
+  to   { transform: translateX(100%); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 0.7; }
+  to   { opacity: 0; }
+}
+
+.overlay-fade-out {
+  animation: fadeOut 0.3s ease-out forwards;
+}
+
+.overlay-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.quantity-in {
+  animation: quantityIn 0.2s ease-out;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #0F0F0F;
+  color: #F0F0F0;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(-50%) translateY(0); }
+  to   { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+}
+
+/* ─── CDK Dialog ─── */
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.burger-dialog-backdrop {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.burger-modal-pane {
+  animation: modalIn 0.2s ease-out;
+  border-radius: 16px;
+  overflow: hidden;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Oculta la barra de scroll en el body del modal de ingredientes */
+.modal-scroll::-webkit-scrollbar {
+  display: none;
+}
+.modal-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

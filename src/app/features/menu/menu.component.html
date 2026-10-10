@@ -1,0 +1,171 @@
+<div id="main-content">
+
+  <!-- ─── STICKY TABS ─── -->
+  <div class="sticky top-14 z-30 flex overflow-x-auto"
+    style="background: rgba(15,15,15,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid #2A2A2A; scrollbar-width: none;"
+    role="tablist" aria-label="Categorías del menú">
+    @for (cat of categories; track cat.key) {
+    <button (click)="scrollToCategory(cat.key)"
+      class="flex-shrink-0 flex items-center gap-1.5 px-4 py-3.5 font-heading font-semibold text-sm transition-colors duration-150 whitespace-nowrap border-b-2 focus:outline-none focus:ring-inset focus:ring-2 focus:ring-brand-orange"
+      [class.text-brand-orange]="activeTab() === cat.key" [class.border-brand-orange]="activeTab() === cat.key"
+      [class.text-brand-cream]="activeTab() !== cat.key" [class.border-transparent]="activeTab() !== cat.key" role="tab"
+      [attr.aria-selected]="activeTab() === cat.key" [attr.aria-controls]="'section-' + cat.key">
+      <span aria-hidden="true">{{ cat.emoji }}</span>
+      {{ cat.label }}
+    </button>
+    }
+  </div>
+
+  <!-- ─── ESTADOS: LOADING / ERROR / CONTENIDO ─── -->
+  @if (loading()) {
+  <div class="flex justify-center items-center py-20">
+    <svg class="animate-spin w-8 h-8" style="color: #F07800;" xmlns="http://www.w3.org/2000/svg" fill="none"
+      viewBox="0 0 24 24" aria-label="Cargando productos">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+    </svg>
+  </div>
+  } @else if (error()) {
+  <div class="flex flex-col items-center justify-center py-20 px-6 text-center">
+    <p class="font-body text-sm mb-5" style="color: #F0DCC8;">{{ error() }}</p>
+    <button (click)="retry()"
+      class="px-6 py-2.5 rounded-xl font-heading font-bold text-sm transition-all hover:opacity-90 active:scale-95"
+      style="background: #F07800; color: #0F0F0F;">Reintentar</button>
+  </div>
+  } @else {
+
+  <!-- ─── BURGER DE LA SEMANA ─── -->
+  @if (burgerOfTheWeek(); as bw) {
+  <div class="max-w-lg mx-auto">
+    <div class="px-4 pt-4 pb-1">
+      <p style="color: #F0DCC8; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;">
+        Burger de la semana</p>
+    </div>
+    <div class="mx-4 mb-2 rounded-2xl overflow-hidden relative" style="border: 1px solid #F07800;">
+      <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=400&fit=crop"
+        alt="Burger de la semana" style="width: 100%; height: 160px; object-fit: cover; display: block;"
+        loading="eager" />
+      <div
+        style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.88)); padding: 28px 14px 14px;">
+        <div class="flex items-end justify-between gap-2 mt-1">
+          <div>
+            <p style="color: #F0F0F0; font-size: 17px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif;">
+              {{ bw.name }}</p>
+            <p style="color: #F0DCC8; font-size: 11px; margin-top: 2px; opacity: 0.85;">
+              {{ bw.description }}</p>
+            @if (bw.precioOferta) {
+            <div class="flex items-center gap-2 mt-2">
+              <span class="font-display text-xl" style="color: #f07800d5;">{{ formatPrice(bw.precioOferta) }}</span>
+              <span class="font-body text-sm line-through" style="color: rgba(204, 150, 3, 0.637);">{{
+                formatPrice(bw.price) }}</span>
+              <span class="font-heading font-bold text-xs px-1.5 py-0.5 rounded-full"
+                style="background: #F07800; color: #0F0F0F;">-{{ calcularDescuento(bw.price, bw.precioOferta) }}</span>
+            </div>
+            }
+          </div>
+          @if (bw.precioOferta) {
+          <button (click)="openBurgerOfTheWeekModal()"
+            class="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg font-heading font-semibold text-sm transition-all active:scale-95"
+            style="background: #F07800; color: #0F0F0F; white-space: nowrap;"
+            aria-label="Agregar burger de la semana al carrito">
+            + Agregar
+          </button>
+          } @else {
+          <span class="font-body text-xs text-center" style="color: #F07800; white-space: nowrap;">
+            Lunes a Jueves
+          </span>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- ─── COMBOS ─── -->
+  <div class="max-w-lg mx-auto px-4 pt-4 pb-1">
+    <p style="color: #F0DCC8; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;">
+      Combos</p>
+  </div>
+  <div class="flex gap-3 pb-4 overflow-x-auto"
+    style="scrollbar-width: none; padding-left: max(1rem, calc((100vw - 32rem) / 2)); padding-right: 1rem;">
+    @for (combo of combos(); track combo.id) {
+    <div class="flex-shrink-0 rounded-xl overflow-hidden"
+      style="width: 140px; background: #1A1A1A; border: 1px solid #2A2A2A;">
+      <img [src]="combo.imageUrl" [alt]="combo.name"
+        style="width: 100%; height: 75px; object-fit: cover; display: block;" loading="lazy" />
+      <div class="p-2">
+        <p style="color: #F0F0F0; font-size: 11px; font-weight: 600; line-height: 1.3;">{{ combo.name }}</p>
+        <div class="flex items-center justify-between mt-1">
+          <p style="color: #F07800; font-size: 12px; font-weight: 700;">{{ formatPrice(combo.price) }}</p>
+          <button (click)="openComboDetail(combo)"
+            class="flex items-center justify-center w-6 h-6 rounded-full transition-colors hover:opacity-70 font-heading font-bold text-xs"
+            style="color: #d89f03; border: 1px solid #d89f03;" [attr.aria-label]="'Ver qué incluye ' + combo.name">
+            i
+          </button>
+        </div>
+        @if (getComboQuantity(combo) > 0) {
+        <div class="flex items-center justify-between mt-2 rounded-lg px-1" style="background: #242424; height: 36px;">
+          <button (click)="removeComboItem(combo)"
+            style="color: #F07800; padding: 4px 6px; font-size: 14px; font-weight: 700;">−</button>
+          <span style="color: #F0F0F0; font-size: 11px; font-weight: 700;">{{ getComboQuantity(combo) }}</span>
+          <button (click)="addComboToCart(combo)"
+            style="color: #F07800; padding: 4px 6px; font-size: 14px; font-weight: 700;">+</button>
+        </div>
+        } @else {
+        <button (click)="addComboToCart(combo)"
+          class="w-full mt-2 rounded-lg font-heading font-semibold transition-all flex items-center justify-center gap-1"
+          style="background: #F07800; color: #000; font-size: 14px; height: 36px; border: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Agregar
+        </button>
+        }
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- ─── PRODUCT SECTIONS ─── -->
+  <main class="px-4 pb-10 max-w-lg mx-auto">
+
+    @for (cat of categories; track cat.key) {
+    <section [id]="'section-' + cat.key" class="pt-6" [attr.aria-labelledby]="'heading-' + cat.key" role="tabpanel">
+      <!-- Category heading -->
+      <div class="flex items-center gap-3 mb-4">
+        <h2 [id]="'heading-' + cat.key" class="font-display text-3xl text-brand-white tracking-wide">
+          {{ cat.label }}
+        </h2>
+        <div class="flex-1 h-px" style="background: linear-gradient(to right, #F07800, transparent);"></div>
+      </div>
+
+      <!-- Banner informativo (solo hamburguesas) -->
+      @if (cat.key === 'hamburguesas') {
+      <div class="mb-3 flex items-center gap-2 px-3 py-2 rounded-lg"
+        style="background: rgba(240,120,0,0.07); border: 1px solid rgba(240,120,0,0.2);">
+        <span style="font-size: 16px; flex-shrink: 0;">🍟</span>
+        <p class="font-body text-xs leading-relaxed" style="color: #F0DCC8;">
+          Todas nuestras burgers incluyen <strong style="color: #F0F0F0;">papas fritas caseras</strong> y <strong
+            style="color: #F0F0F0;">salsa de la casa</strong>.
+        </p>
+      </div>
+      }
+
+      <!-- Products grid -->
+      <div class="flex flex-col gap-3" role="list" [attr.aria-label]="'Productos de ' + cat.label">
+        @for (product of getProducts(cat.key); track product.id) {
+        <div role="listitem">
+          <app-product-card [product]="product" />
+        </div>
+        }
+      </div>
+    </section>
+    }
+
+  </main>
+
+  }
+
+</div>
