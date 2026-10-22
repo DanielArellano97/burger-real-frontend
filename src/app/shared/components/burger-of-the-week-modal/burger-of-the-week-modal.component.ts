@@ -50,7 +50,7 @@ export interface BurgerOfTheWeekModalResult {
         >
           <span class="flex-shrink-0 text-sm">⚠️</span>
           <p class="font-body text-sm leading-relaxed" style="color: #F0DCC8;">
-            Esta burger se entrega <strong style="color: #F0F0F0;">tal como está</strong>. No admite modificaciones en sus ingredientes.
+            Esta burger se entrega <strong style="color: #F0F0F0;">tal como es</strong>. No admite modificaciones en sus ingredientes.
           </p>
         </div>
 
@@ -99,11 +99,7 @@ export interface BurgerOfTheWeekModalResult {
           class="flex-[2] py-3 rounded-xl font-heading font-bold text-base transition-all hover:opacity-90 active:scale-95"
           style="background: #F07800; color: #0F0F0F;"
         >
-          @if (data.burger.precioOferta) {
-            Agregar — {{ formatPrice(data.burger.precioOferta) }}
-          } @else {
-            + Agregar al carrito
-          }
+          Agregar — {{ formatPrice(data.burger.precioOferta ?? data.burger.price) }}
         </button>
       </div>
     </div>

@@ -25,4 +25,5 @@ export interface Product {
   ingredients: Ingredient[];
   variants?: SizeVariant[];
   precioOferta?: number;
+  allowExtras?: boolean;
 }

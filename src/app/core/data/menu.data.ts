@@ -4,75 +4,191 @@ export const MENU_DATA: Product[] = [
   // ─── Hamburguesas ───
   {
     id: 1,
-    name: 'Clásica Real',
-    description: 'Medallón 150g, lechuga, tomate, cebolla, mayo y ketchup',
+    name: 'Cheese Burger',
+    description: 'Medallón 100g y cheddar americano. Nuestra clásica',
+    price: 4490,
+    category: 'hamburguesas',
+    customizable: true,
+    ingredients: [
+      { id: 201, name: 'Medallón de Vacuno',    defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
+      { id: 202, name: 'Cheddar Americano',                 defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Cheese Bacon',
+    description: 'Medallón 100g, cheddar americano y tocino ahumado.',
+    price: 5190,
+    category: 'hamburguesas',
+    customizable: true,
+    ingredients: [
+      { id: 201, name: 'Medallón de Vacuno',    defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
+      { id: 202, name: 'Cheddar Americano',                 defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
+      { id: 203, name: 'Tocino Ahumado',                 defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Onion Caramel',
+    description: 'Medallón 100g, cheddar americano y cebolla caramelizada',
+    price: 4990,
+    precioOferta: 3990, // <--- ¡Agregamos esto para activar el banner y el botón!
+    category: 'hamburguesas',
+    customizable: true,
+    ingredients: [
+      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
+      { id: 202, name: 'Cheddar Americano',      defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
+      { id: 204, name: 'Cebolla Caramelizada',         defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+    ],
+  },
+  {
+    id: 4,
+    name: 'Onion Ring',
+    description: 'Medallón 100g, cheddar americano y aritos de cebolla (x2)',
+    price: 4990,
+    precioOferta: 3990, // <--- ¡Agregamos esto para activar el banner y el botón!
+    category: 'hamburguesas',
+    customizable: true,
+    ingredients: [
+      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
+      { id: 202, name: 'Cheddar Americano',      defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
+      { id: 205, name: 'Aritos de Cebolla (x2)',         defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+    ],
+  },
+  {
+    id: 5,
+    name: 'Real de la casa',
+    description: 'Medallón de 100g, cheddar americano, cebolla caramelizada, tocino ahumado y aritos de cebolla (x2)',
     price: 6990,
     precioOferta: 5990, // <--- ¡Agregamos esto para activar el banner y el botón!
     category: 'hamburguesas',
     customizable: true,
     ingredients: [
-      { id: 101, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 2500, isRequired: true },
-      { id: 102, name: 'Lechuga',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 400 },
-      { id: 103, name: 'Tomate',             defaultQuantity: 1, currentQuantity: 1, extraPrice: 500 },
-      { id: 104, name: 'Cebolla',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 400 },
-      { id: 105, name: 'Mayo',               defaultQuantity: 1, currentQuantity: 1, extraPrice: 300 },
-      { id: 106, name: 'Ketchup',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 300 },
-      { id: 107, name: 'Queso Cheddar',      defaultQuantity: 0, currentQuantity: 0, extraPrice: 800 },
-    ],
+      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
+      { id: 202, name: 'Cheddar Americano',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
+      { id: 204, name: 'Cebolla Caramelizada',             defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+      { id: 203, name: 'Tocino Ahumado',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+      { id: 205, name: 'Aritos de Cebolla (x2)',               defaultQuantity: 1, currentQuantity: 1, extraPrice: 800 },
+    ]
   },
   {
-    id: 2,
-    name: 'BBQ Bacon Real',
-    description: 'Medallón 180g, bacon crocante, cheddar, salsa BBQ y cebolla caramelizada',
-    price: 8990,
+    id: 6,
+    name: 'Onion Caramel Bacon',
+    description: 'Medallón de 100g, cheddar americano, cebolla caramelizada y tocino ahumado',
+    price: 5690,
+    precioOferta: 4690, // <--- ¡Agregamos esto para activar el banner y el botón!
     category: 'hamburguesas',
     customizable: true,
     ingredients: [
-      { id: 201, name: 'Medallón de Vacuno',    defaultQuantity: 1, currentQuantity: 1, extraPrice: 2500, isRequired: true },
-      { id: 202, name: 'Bacon',                 defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500 },
-      { id: 203, name: 'Queso Cheddar',         defaultQuantity: 1, currentQuantity: 1, extraPrice: 800 },
-      { id: 204, name: 'Salsa BBQ',             defaultQuantity: 1, currentQuantity: 1, extraPrice: 300 },
-      { id: 205, name: 'Cebolla Caramelizada',  defaultQuantity: 1, currentQuantity: 1, extraPrice: 400 },
-      { id: 206, name: 'Lechuga',               defaultQuantity: 0, currentQuantity: 0, extraPrice: 400 },
-      { id: 207, name: 'Tomate',                defaultQuantity: 0, currentQuantity: 0, extraPrice: 500 },
-    ],
+      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
+      { id: 202, name: 'Cheddar Americano',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
+      { id: 204, name: 'Cebolla Caramelizada',             defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+      { id: 203, name: 'Tocino Ahumado',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+    ]
   },
   {
-    id: 3,
-    name: 'Doble Real',
-    description: 'Dos medallones 150g, doble cheddar, pepinillos y salsa especial',
-    price: 10990,
-    precioOferta: 5990, // <--- ¡Agregamos esto para activar el banner y el botón!
+    id: 7,
+    name: 'Onion Ring Bacon',
+    description: 'Medallón de 100g, cheddar americano, tocino ahumado y aritos de cebolla (x2)',
+    price: 5690,
+    precioOferta: 4690, // <--- ¡Agregamos esto para activar el banner y el botón!
     category: 'hamburguesas',
     customizable: true,
     ingredients: [
-      { id: 301, name: 'Medallón de Vacuno', defaultQuantity: 2, currentQuantity: 2, extraPrice: 2500, isRequired: true },
-      { id: 302, name: 'Queso Cheddar',      defaultQuantity: 2, currentQuantity: 2, extraPrice: 800 },
-      { id: 303, name: 'Pepinillos',         defaultQuantity: 1, currentQuantity: 1, extraPrice: 400 },
-      { id: 304, name: 'Salsa Especial',     defaultQuantity: 1, currentQuantity: 1, extraPrice: 300 },
-      { id: 305, name: 'Lechuga',            defaultQuantity: 0, currentQuantity: 0, extraPrice: 400 },
-      { id: 306, name: 'Tomate',             defaultQuantity: 0, currentQuantity: 0, extraPrice: 500 },
-    ],
+      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
+      { id: 202, name: 'Cheddar Americano',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
+      { id: 203, name: 'Tocino Ahumado',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+      { id: 205, name: 'Aritos de Cebolla (x2)',               defaultQuantity: 1, currentQuantity: 1, extraPrice: 800 },
+    ]
   },
   {
-    id: 4,
-    name: 'Pollo Crispy',
-    description: 'Pechuga apanada, coleslaw, tomate y mayo de ajo',
-    price: 7990,
+    id: 8,
+    name: 'Avocado Bacon',
+    description: 'Medallón de 100g, cheddar americano, tocino ahumado y palta',
+    price: 6190,
+    precioOferta: 5190, // <--- ¡Agregamos esto para activar el banner y el botón!
     category: 'hamburguesas',
     customizable: true,
     ingredients: [
-      { id: 401, name: 'Pechuga Crispy', defaultQuantity: 1, currentQuantity: 1, extraPrice: 2000, isRequired: true },
-      { id: 402, name: 'Coleslaw',       defaultQuantity: 1, currentQuantity: 1, extraPrice: 500 },
-      { id: 403, name: 'Tomate',         defaultQuantity: 1, currentQuantity: 1, extraPrice: 500 },
-      { id: 404, name: 'Mayo de Ajo',    defaultQuantity: 1, currentQuantity: 1, extraPrice: 300 },
-      { id: 405, name: 'Bacon',          defaultQuantity: 0, currentQuantity: 0, extraPrice: 1500 },
-      { id: 406, name: 'Queso Cheddar',  defaultQuantity: 0, currentQuantity: 0, extraPrice: 800 },
-    ],
+      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
+      { id: 202, name: 'Cheddar Americano',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
+      { id: 203, name: 'Tocino Ahumado',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+      { id: 206, name: 'Palta',               defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+    ]
   },
-  // ─── Bebestibles ───
   {
     id: 9,
+    name: 'Avocado Egg',
+    description: 'Medallón de 100g, cheddar americano, palta y huevo frito',
+    price: 6190,
+    precioOferta: 5190, // <--- ¡Agregamos esto para activar el banner y el botón!
+    category: 'hamburguesas',
+    customizable: true,
+    ingredients: [
+      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
+      { id: 202, name: 'Cheddar Americano',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
+      { id: 206, name: 'Palta',               defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+      { id: 207, name: 'Huevo Frito',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+    ]
+  },
+  {
+    id: 10,
+    name: 'La Trilogía del Rey (by @selvaenlaluna)',
+    description: 'Medallón de 100g, cheddar americano, cebolla caramelizada y huevo frito',
+    price: 5590,
+    precioOferta: 4590, // <--- ¡Agregamos esto para activar el banner y el botón!
+    category: 'hamburguesas',
+    customizable: true,
+    ingredients: [
+      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
+      { id: 202, name: 'Cheddar Americano',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
+      { id: 204, name: 'Cebolla Caramelizada',             defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+      { id: 207, name: 'Huevo Frito',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+    ]
+  },
+
+
+
+
+  //─── Acompañamientos ───
+  {
+    id: 11, // ID único numérico o string
+    name: 'Papas Fritas Reales',
+    description: 'Ricas papitas caseras acompañadas con salsa de la casa',
+    price: 1990, // Precio base (el que acompaña al "desde")
+    category: 'acompañamientos', // <--- ¡OBLIGATORIO! Debe coincidir exactamente con este string (con la 'ñ')
+    customizable: true, // Idealmente true para que permita elegir porciones/variantes
+    image: 'assets/images/papas.webp', // O una URL de Unsplash
+    variants: [         // Las opciones de porción que se abrirán en el modal
+      { id: 501, name: 'Porción Normal (150g)', shortName: '150g', extraPrice: 0 },
+      { id: 502, name: 'Porción Mediana (250g)', shortName: '250g', extraPrice: 2990 },
+      { id: 503, name: 'Porción Grande (300g)', shortName: '300g', extraPrice: 3990 },
+    ],
+    ingredients: [], // O los ingredientes si se pueden personalizar
+  },
+  {
+    id: 12, // ID único numérico o string
+    name: 'Aritos de Cebolla',
+    description: 'Porción de crujientes aritos de cebolla para acompañar tu pedido',
+    price: 1190, // Precio base (el que acompaña al "desde")
+    category: 'acompañamientos', // <--- ¡OBLIGATORIO! Debe coincidir exactamente con este string (con la 'ñ')
+    customizable: true, // Idealmente true para que permita elegir porciones/variantes
+    allowExtras: false, // <--- ¡Con esto ocultas la sección de extras!
+    image: 'assets/images/aritos.webp', // O una URL de Unsplash
+    variants: [         // Las opciones de porción que se abrirán en el modal
+      { id: 601, name: 'Porción Normal (x5)', shortName: 'x5', extraPrice: 0 },
+      { id: 602, name: 'Porción Mediana (x10)', shortName: 'x10', extraPrice: 2390 },
+      { id: 603, name: 'Porción Grande (x15)', shortName: 'x15', extraPrice: 3590 },
+    ],
+    ingredients: [], // O los ingredientes si se pueden personalizar
+  },
+
+
+
+
+  // ─── Bebestibles ───
+  {
+    id: 21,
     name: 'Coca-Cola 350ml',
     description: 'Lata fría de Coca-Cola',
     price: 1500,
@@ -81,28 +197,37 @@ export const MENU_DATA: Product[] = [
     ingredients: [],
   },
   {
-    id: 10,
-    name: 'Jugo Natural',
-    description: 'Jugo natural del día, 400ml',
-    price: 2000,
-    category: 'bebestibles',
-    customizable: false,
-    ingredients: [],
-  },
-  {
-    id: 11,
-    name: 'Agua Mineral 500ml',
-    description: 'Agua mineral sin gas',
-    price: 1000,
-    category: 'bebestibles',
-    customizable: false,
-    ingredients: [],
-  },
-  {
-    id: 12,
-    name: 'Fanta/Sprite 350ml',
-    description: 'Lata fría a elección',
+    id: 22,
+    name: 'Fanta 350ml',
+    description: 'Lata fría de Fanta',
     price: 1500,
+    category: 'bebestibles',
+    customizable: false,
+    ingredients: [],
+  },
+  {
+    id: 23,
+    name: 'Sprite 350ml',
+    description: 'Lata fría de Sprite',
+    price: 1500,
+    category: 'bebestibles',
+    customizable: false,
+    ingredients: [],
+  },
+  {
+    id: 24,
+    name: 'Agua Gasificada 500cc',
+    description: 'Agua mineral alcalina con gas',
+    price: 1200,
+    category: 'bebestibles',
+    customizable: false,
+    ingredients: [],
+  },
+  {
+    id: 25,
+    name: 'Jugo Jumex Piña Coco',
+    description: 'Refrescante néctar de fruta en lata.',
+    price: 1200,
     category: 'bebestibles',
     customizable: false,
     ingredients: [],
@@ -111,27 +236,54 @@ export const MENU_DATA: Product[] = [
   // ─── Extras ───
   
   {
-    id: 14,
+    id: 31,
     name: 'Bacon Extra',
-    description: 'Tiras de bacon crocante adicionales',
+    description: 'Tira de bacon crocante adicional',
     price: 1500,
     category: 'extras',
     customizable: false,
     ingredients: [],
   },
   {
-    id: 15,
+    id: 32,
     name: 'Queso Cheddar',
     description: 'Lámina adicional de queso cheddar fundido',
-    price: 800,
+    price: 600,
     category: 'extras',
     customizable: false,
     ingredients: [],
   },
   {
-    id: 16,
+    id: 33,
     name: 'Huevo Frito',
     description: 'Huevo frito sobre tu hamburguesa',
+    price: 1000,
+    category: 'extras',
+    customizable: false,
+    ingredients: [],
+  },
+  {
+    id: 34,
+    name: 'Aritos de Cebolla (x2)',
+    description: 'Par de Aritos de Cebolla para tu hamburguesa',
+    price: 1000,
+    category: 'extras',
+    customizable: false,
+    ingredients: [],
+  },
+  {
+    id: 35,
+    name: 'Cebolla Caramelizada',
+    description: 'Cebolla Caramelizada Real para tu hamburguesa',
+    price: 1000,
+    category: 'extras',
+    customizable: false,
+    ingredients: [],
+  },
+  {
+    id: 36,
+    name: 'Palta',
+    description: 'La Reina Verde para tu hamburguesa',
     price: 1000,
     category: 'extras',
     customizable: false,

@@ -23,7 +23,7 @@ export interface IngredientModalResult {
   template: `
     <div
       class="flex flex-col w-full overflow-hidden"
-      style="background: #1A1A1A; border-top: 3px solid #F07800; height: 82vh; max-height: 82vh;"
+      style="background: #1A1A1A; border-top: 3px solid #F07800; max-height: 85vh;"
     >
       <!-- HEADER — fijo -->
       <div class="flex-shrink-0 flex items-start justify-between px-5 pt-5 pb-4 border-b" style="border-color: #2A2A2A;">
@@ -67,8 +67,13 @@ export interface IngredientModalResult {
                 >
                   <span style="font-size: 14px;">{{ variant.shortName }}</span>
                   @if (variant.extraPrice > 0) {
-                    <span [class.invisible]="variant.extraPrice === 0" style="font-size: 10px; line-height: 1.2;">+{{ formatPrice(variant.extraPrice) }}</span>
-                  }
+                    <span style="font-size: 10px; line-height: 1.2;">
+                      @if (isAccompaniment()) {
+                        {{ formatPrice(variant.extraPrice) }}
+                      } @else {
+                        +{{ formatPrice(variant.extraPrice) }}
+                      }
+                    </span>                  }
                 </button>
               }
             </div>
@@ -133,59 +138,61 @@ export interface IngredientModalResult {
         }
 
         @if (dynamicExtras().length > 0) {
-          <div class="border-t" style="border-color: #2A2A2A; margin: 12px 0;"></div>
-          <p
-            class="flex items-center gap-1 mb-2"
-            style="color: #F07800; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;"
-          >
-            <svg lucidePlus class="w-3 h-3 flex-shrink-0" aria-hidden="true"></svg>
-            ¿Deseas agregar extras?
-          </p>
-
-          @for (extra of dynamicExtras(); track extra.id) {
-            <div
-              class="flex items-center justify-between gap-3 py-2"
-              [class.border-b]="!$last"
-              style="border-color: #242424;"
-              role="listitem"
+          @if (allowExtras() && dynamicExtras().length > 0) {
+            <div class="border-t" style="border-color: #2A2A2A; margin: 12px 0;"></div>
+            <p
+              class="flex items-center gap-1 mb-2"
+              style="color: #F07800; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;"
             >
-              <div class="flex-1 min-w-0">
-                <span class="font-body text-sm leading-tight" style="color: #F0F0F0;">{{ extra.name }}</span>
-              </div>
+              <svg lucidePlus class="w-3 h-3 flex-shrink-0" aria-hidden="true"></svg>
+              ¿Deseas agregar extras?
+            </p>
 
-              @if (extra.currentQuantity > 0 && extra.extraPrice > 0) {
-                <span
-                  class="inline-flex items-center text-[11px] font-semibold rounded-full px-1.5 py-0.5 mr-1 transition-opacity duration-200"
-                  style="background: #F07800; color: #0F0F0F;"
-                >+{{ formatPrice(extra.currentQuantity * extra.extraPrice) }}</span>
-              }
+            @for (extra of dynamicExtras(); track extra.id) {
+              <div
+                class="flex items-center justify-between gap-3 py-2"
+                [class.border-b]="!$last"
+                style="border-color: #242424;"
+                role="listitem"
+              >
+                <div class="flex-1 min-w-0">
+                  <span class="font-body text-sm leading-tight" style="color: #F0F0F0;">{{ extra.name }}</span>
+                </div>
 
-              <div class="flex items-center gap-1.5 flex-shrink-0" role="group" [attr.aria-label]="'Cantidad de ' + extra.name">
-                <button
-                  (click)="adjustExtra(extra.id, -1)"
-                  [disabled]="extra.currentQuantity === 0"
-                  class="w-8 h-8 flex items-center justify-center rounded-lg font-bold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                  style="background: #242424; color: #F0F0F0;"
-                  [attr.aria-label]="'Reducir ' + extra.name"
-                >
-                  <svg lucideMinus class="w-3.5 h-3.5" aria-hidden="true"></svg>
-                </button>
-                <span
-                  class="w-7 text-center font-heading font-bold text-sm"
-                  [style.color]="extra.currentQuantity > 0 ? '#F07800' : '#555'"
-                  aria-live="polite"
-                >{{ extra.currentQuantity }}</span>
-                <button
-                  (click)="adjustExtra(extra.id, 1)"
-                  [disabled]="extra.currentQuantity >= 5"
-                  class="w-8 h-8 flex items-center justify-center rounded-lg font-bold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                  style="background: #242424; color: #F0F0F0;"
-                  [attr.aria-label]="'Agregar más ' + extra.name"
-                >
-                  <svg lucidePlus class="w-3.5 h-3.5" aria-hidden="true"></svg>
-                </button>
+                @if (extra.currentQuantity > 0 && extra.extraPrice > 0) {
+                  <span
+                    class="inline-flex items-center text-[11px] font-semibold rounded-full px-1.5 py-0.5 mr-1 transition-opacity duration-200"
+                    style="background: #F07800; color: #0F0F0F;"
+                  >+{{ formatPrice(extra.currentQuantity * extra.extraPrice) }}</span>
+                }
+
+                <div class="flex items-center gap-1.5 flex-shrink-0" role="group" [attr.aria-label]="'Cantidad de ' + extra.name">
+                  <button
+                    (click)="adjustExtra(extra.id, -1)"
+                    [disabled]="extra.currentQuantity === 0"
+                    class="w-8 h-8 flex items-center justify-center rounded-lg font-bold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    style="background: #242424; color: #F0F0F0;"
+                    [attr.aria-label]="'Reducir ' + extra.name"
+                  >
+                    <svg lucideMinus class="w-3.5 h-3.5" aria-hidden="true"></svg>
+                  </button>
+                  <span
+                    class="w-7 text-center font-heading font-bold text-sm"
+                    [style.color]="extra.currentQuantity > 0 ? '#F07800' : '#555'"
+                    aria-live="polite"
+                  >{{ extra.currentQuantity }}</span>
+                  <button
+                    (click)="adjustExtra(extra.id, 1)"
+                    [disabled]="extra.currentQuantity >= 5"
+                    class="w-8 h-8 flex items-center justify-center rounded-lg font-bold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    style="background: #242424; color: #F0F0F0;"
+                    [attr.aria-label]="'Agregar más ' + extra.name"
+                  >
+                    <svg lucidePlus class="w-3.5 h-3.5" aria-hidden="true"></svg>
+                  </button>
+                </div>
               </div>
-            </div>
+            }
           }
         }
 
@@ -197,8 +204,8 @@ export interface IngredientModalResult {
         <div class="flex items-center justify-between rounded-lg px-3 py-2.5" style="background: #111;">
           <span class="font-body text-sm" style="color: #888;">Precio unitario</span>
           <div class="flex items-center gap-2">
-            @if (previewPrice() > data.product.price) {
-              <span class="font-body text-sm line-through" style="color: #555;">{{ formatPrice(data.product.price) }}</span>
+            @if (showStrikeThrough()) {
+              <span class="font-body text-sm line-through" style="color: #555;">{{ formatPrice(strikeThroughPrice()) }}</span>
               <span class="font-heading font-bold text-lg text-brand-orange" aria-live="polite">{{ formatPrice(previewPrice()) }}</span>
             } @else {
               <span class="font-heading font-bold text-lg text-brand-orange">{{ formatPrice(previewPrice()) }}</span>
@@ -210,7 +217,7 @@ export interface IngredientModalResult {
           <div class="flex items-start gap-2 px-3 py-2 rounded-lg" style="background: rgba(240, 120, 0, 0.08); border: 1px solid rgba(240, 120, 0, 0.2);">
             <span class="text-sm flex-shrink-0">⚠️</span>
             <p class="font-body text-xs leading-relaxed" style="color: #F0DCC8;">
-              Estás dejando tu hamburguesa muy solita. ¿Seguro que no quieres agregarle algún aderezo?
+              Estás dejando tu hamburguesa muy solita. ¿Estas seguro Real?
             </p>
           </div>
         }
@@ -252,6 +259,9 @@ export class IngredientModalComponent {
   private getDefaultVariant(): SizeVariant | undefined {
     const variants = this.data.product.variants;
     if (!variants || variants.length === 0) return undefined;
+    if (this.isAccompaniment()) {
+      return variants[0];
+    }
     return variants.find(v => v.extraPrice === 0) ?? variants[0];
   }
 
@@ -306,11 +316,32 @@ export class IngredientModalComponent {
       this.dynamicExtras().some(e => e.currentQuantity > 0);
   });
 
-  confirmButtonLabel = computed(() =>
-    this.isModified() ? 'Confirmar personalización' : 'Agregar receta original'
-  );
+  confirmButtonLabel = computed(() => {
+    // Si es acompañamiento
+    if (this.isAccompaniment()) {
+      // Si tiene extras añadidos, pasa a ser personalización
+      const hasExtrasAdded = this.dynamicExtras().some(e => e.currentQuantity > 0);
+      return hasExtrasAdded ? 'Confirmar personalización' : 'Agregar';
+    }
+
+    // Si es hamburguesa (mantiene la lógica original)
+    return this.isModified() ? 'Confirmar personalización' : 'Agregar receta original';
+  });
 
   previewPrice = computed(() => {
+
+    // SI ES ACOMPAÑAMIENTO: 
+    if (this.isAccompaniment()) {
+      const variant = this.selectedVariant();
+      // Si la variante tiene un precio definido (>0), lo usamos; de lo contrario, usamos el precio base del producto
+      const variantPrice = (variant && variant.extraPrice > 0) ? variant.extraPrice : this.data.product.price;
+
+      const dynamicCost = this.dynamicExtras().reduce((sum, extra) => {
+        return sum + extra.currentQuantity * extra.extraPrice;
+      }, 0);
+      return variantPrice + dynamicCost;
+    }
+
     const variantCost = this.selectedVariant()?.extraPrice ?? 0;
     const baseExtras = this.ingredients().reduce((sum, ing) => {
       const excedente = Math.max(0, ing.currentQuantity - ing.defaultQuantity);
@@ -321,6 +352,26 @@ export class IngredientModalComponent {
     }, 0);
     return this.data.product.price + variantCost + baseExtras + dynamicCost;
   });
+
+  // Determina qué precio debe ir tachado (para papas es la variante actual; para burgers es el precio base)
+  strikeThroughPrice = computed(() => {
+    if (this.isAccompaniment()) {
+      const variant = this.selectedVariant();
+      return (variant && variant.extraPrice > 0) ? variant.extraPrice : this.data.product.price;
+    }
+    return this.data.product.price;
+  });
+
+  // Define si debemos mostrar el precio tachado (en papas solo si hay extras añadidos)
+  showStrikeThrough = computed(() => {
+    if (this.isAccompaniment()) {
+      const dynamicCost = this.dynamicExtras().reduce((sum, extra) => sum + extra.currentQuantity * extra.extraPrice, 0);
+      return dynamicCost > 0;
+    }
+    return this.previewPrice() > this.data.product.price;
+  });
+
+  allowExtras = computed(() => this.data.product.allowExtras ?? true);
 
   private buildExtraQuantities(): Map<number, number> {
     const map = new Map<number, number>();
