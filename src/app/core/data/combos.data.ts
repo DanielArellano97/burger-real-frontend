@@ -1,1 +1,148 @@
-// Combos are now loaded from the backend via ComboService
+import { Combo } from '../models/combo.model';
+
+export const COMBOS_DATA: Combo[] = [
+  {
+    id: 1,
+    name: 'Combo Clásico',
+    description: 'Clásica Real + Papas 250g + Bebida a elección',
+    price: 9990,
+    imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop',
+    detalles: [
+      {
+        productoId: 1,
+        productoNombre: 'Clásica Real',
+        cantidad: 1,
+        requiereSeleccion: false,
+        varianteSeleccionada: null,
+        opcionesDisponibles: [],
+      },
+      {
+        productoId: 5,
+        productoNombre: 'Papas 250g',
+        cantidad: 1,
+        requiereSeleccion: false,
+        varianteSeleccionada: null,
+        opcionesDisponibles: [],
+      },
+      {
+        productoId: 0,
+        productoNombre: 'Bebida a elección',
+        cantidad: 1,
+        requiereSeleccion: true,
+        varianteSeleccionada: null,
+        opcionesDisponibles: [
+          { id: 9, name: 'Coca-Cola 350ml', shortName: 'Coca-Cola', extraPrice: 0 },
+          { id: 12, name: 'Fanta/Sprite 350ml', shortName: 'Fanta/Sprite', extraPrice: 0 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Combo BBQ',
+    description: 'BBQ Bacon Real + Papas Cheddar 250g + Bebida a elección',
+    price: 12990,
+    imageUrl: 'https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400&h=300&fit=crop',
+    detalles: [
+      {
+        productoId: 2,
+        productoNombre: 'BBQ Bacon Real',
+        cantidad: 1,
+        requiereSeleccion: false,
+        varianteSeleccionada: null,
+        opcionesDisponibles: [],
+      },
+      {
+        productoId: 6,
+        productoNombre: 'Papas Cheddar 250g',
+        cantidad: 1,
+        requiereSeleccion: false,
+        varianteSeleccionada: null,
+        opcionesDisponibles: [],
+      },
+      {
+        productoId: 0,
+        productoNombre: 'Bebida a elección',
+        cantidad: 1,
+        requiereSeleccion: true,
+        varianteSeleccionada: null,
+        opcionesDisponibles: [
+          { id: 9, name: 'Coca-Cola 350ml', shortName: 'Coca-Cola', extraPrice: 0 },
+          { id: 12, name: 'Fanta/Sprite 350ml', shortName: 'Fanta/Sprite', extraPrice: 0 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Combo Doble',
+    description: 'Doble Real + Papas 250g + Bebida a elección',
+    price: 14990,
+    imageUrl: 'https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=400&h=300&fit=crop',
+    detalles: [
+      {
+        productoId: 3,
+        productoNombre: 'Doble Real',
+        cantidad: 1,
+        requiereSeleccion: false,
+        varianteSeleccionada: null,
+        opcionesDisponibles: [],
+      },
+      {
+        productoId: 5,
+        productoNombre: 'Papas 250g',
+        cantidad: 1,
+        requiereSeleccion: false,
+        varianteSeleccionada: null,
+        opcionesDisponibles: [],
+      },
+      {
+        productoId: 0,
+        productoNombre: 'Bebida a elección',
+        cantidad: 1,
+        requiereSeleccion: true,
+        varianteSeleccionada: null,
+        opcionesDisponibles: [
+          { id: 9, name: 'Coca-Cola 350ml', shortName: 'Coca-Cola', extraPrice: 0 },
+          { id: 12, name: 'Fanta/Sprite 350ml', shortName: 'Fanta/Sprite', extraPrice: 0 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 4,
+    name: 'Combo Crispy',
+    description: 'Pollo Crispy + Aros x5 + Bebida a elección',
+    price: 11990,
+    imageUrl: 'https://images.unsplash.com/photo-1562802378-063ec186a863?w=400&h=300&fit=crop',
+    detalles: [
+      {
+        productoId: 4,
+        productoNombre: 'Pollo Crispy',
+        cantidad: 1,
+        requiereSeleccion: false,
+        varianteSeleccionada: null,
+        opcionesDisponibles: [],
+      },
+      {
+        productoId: 7,
+        productoNombre: 'Aros x5',
+        cantidad: 1,
+        requiereSeleccion: false,
+        varianteSeleccionada: null,
+        opcionesDisponibles: [],
+      },
+      {
+        productoId: 0,
+        productoNombre: 'Bebida a elección',
+        cantidad: 1,
+        requiereSeleccion: true,
+        varianteSeleccionada: null,
+        opcionesDisponibles: [
+          { id: 9, name: 'Coca-Cola 350ml', shortName: 'Coca-Cola', extraPrice: 0 },
+          { id: 12, name: 'Fanta/Sprite 350ml', shortName: 'Fanta/Sprite', extraPrice: 0 },
+        ],
+      },
+    ],
+  },
+];

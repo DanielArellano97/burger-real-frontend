@@ -113,10 +113,6 @@ import { IngredientModalComponent, IngredientModalResult } from '../../shared/co
                     <p class="font-body text-xs mt-0.5" style="color: #F07800;">• {{ item.selectedVariant.name }}</p>
                   }
 
-                  <p class="font-body text-xs mt-1" style="color: #888;">
-                    {{ formatPrice(item.unitPrice) }} c/u
-                  </p>
-
                   <!-- Quantity controls -->
                   <div class="flex items-center gap-2 mt-2" role="group" [attr.aria-label]="'Cantidad de ' + item.product.name">
                     <button

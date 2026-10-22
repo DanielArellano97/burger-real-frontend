@@ -1,12 +1,9 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-import { ApiIngrediente, ApiProduct, ApiVariante } from '../models/api-product.model';
-import { Ingredient, Product, SizeVariant } from '../models/product.model';
+import { Injectable, signal, computed } from '@angular/core';
+import { MENU_DATA } from '../data/menu.data'; // Ajusta la ruta según donde tengas tu archivo de mock
+import { Ingredient, Product } from '../models/product.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProductoService {
-  private http = inject(HttpClient);
 
   private _products       = signal<Product[]>([]);
   private _allIngredients = signal<Ingredient[]>([]);
@@ -26,82 +23,28 @@ export class ProductoService {
     this._loading.set(true);
     this._error.set(null);
 
-    this.http.get<ApiProduct[]>(`${environment.apiUrl}/api/productos`).subscribe({
-      next: (data) => {
-        const disponibles = data.filter(p => p.disponible);
-        const mapped = disponibles.map(p => this.mapApiProductToProduct(p));
+    setTimeout(() => {
+      try {
+        const products = MENU_DATA;
 
-        const ingredientMap = new Map<number, Ingredient>();
-        disponibles.forEach(p =>
-          p.ingredientes
-            .filter(i => i.permiteAgregar)
-            .forEach(i => {
-              if (!ingredientMap.has(i.id)) {
-                ingredientMap.set(i.id, this.mapIngrediente(i));
-              }
-            })
-        );
+        // Extraemos todos los ingredientes únicos que permiten agregarse/modificarse para los modales
+        const ingredientMap = new Map<number | string, Ingredient>();
+        products.forEach(p => {
+          p.ingredients.forEach(i => {
+            if (!ingredientMap.has(i.id)) {
+              ingredientMap.set(i.id, { ...i });
+            }
+          });
+        });
 
         this._allIngredients.set(Array.from(ingredientMap.values()));
-        this._products.set(mapped);
+        this._products.set(products);
         this._loading.set(false);
-      },
-      error: (err) => {
-        console.error('Error cargando productos:', err);
+      } catch (err) {
+        console.error('Error cargando mock de productos:', err);
         this._error.set('Error al mostrar el menú. Intenta nuevamente.');
         this._loading.set(false);
-      },
-    });
-  }
-
-  private mapApiProductToProduct(api: ApiProduct): Product {
-    const ingredientesModal = api.ingredientes
-      .filter(i => i.permiteQuitar || i.permiteAgregar)
-      .map(i => this.mapIngrediente(i));
-
-
-    const precioOferta = api.precioOferta ?? undefined;
-
-    return {
-      id: api.id,
-      name: api.nombre,
-      description: api.descripcion,
-      price: api.precioVenta,
-      image: api.imagenUrl,
-      category: this.mapCategoria(api.categoria),
-      customizable: api.categoria === 'HAMBURGUESA' || api.categoria === 'ACOMPAÑAMIENTO',
-      ingredients: ingredientesModal,
-      variants: api.variantes.map(v => this.mapVariante(v)),
-      precioOferta,
-    };
-  }
-
-  private mapVariante(api: ApiVariante): SizeVariant {
-    return {
-      id: api.id,
-      name: api.nombre,
-      shortName: api.nombreCorto,
-      extraPrice: api.precioExtra,
-    };
-  }
-
-  private mapIngrediente(api: ApiIngrediente): Ingredient {
-    return {
-      id: api.id,
-      name: api.nombre,
-      defaultQuantity: 1,
-      currentQuantity: 1,
-      extraPrice: api.precioExtra,
-      isRequired: !api.permiteQuitar,
-    };
-  }
-
-  private mapCategoria(cat: string): 'hamburguesas' | 'acompañamientos' | 'bebestibles' {
-    const map: Record<string, 'hamburguesas' | 'acompañamientos' | 'bebestibles'> = {
-      'HAMBURGUESA':    'hamburguesas',
-      'ACOMPAÑAMIENTO': 'acompañamientos',
-      'BEBESTIBLE':     'bebestibles',
-    };
-    return map[cat] ?? 'hamburguesas';
+      }
+    }, 150); // Un pequeño delay estético opcional para simular red si gustas, o déjalo en 0
   }
 }

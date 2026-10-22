@@ -7,6 +7,7 @@ export const MENU_DATA: Product[] = [
     name: 'Clásica Real',
     description: 'Medallón 150g, lechuga, tomate, cebolla, mayo y ketchup',
     price: 6990,
+    precioOferta: 5990, // <--- ¡Agregamos esto para activar el banner y el botón!
     category: 'hamburguesas',
     customizable: true,
     ingredients: [
@@ -41,6 +42,7 @@ export const MENU_DATA: Product[] = [
     name: 'Doble Real',
     description: 'Dos medallones 150g, doble cheddar, pepinillos y salsa especial',
     price: 10990,
+    precioOferta: 5990, // <--- ¡Agregamos esto para activar el banner y el botón!
     category: 'hamburguesas',
     customizable: true,
     ingredients: [
