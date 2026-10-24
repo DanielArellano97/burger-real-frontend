@@ -50,7 +50,7 @@ export interface BurgerOfTheWeekModalResult {
         >
           <span class="flex-shrink-0 text-sm">⚠️</span>
           <p class="font-body text-sm leading-relaxed" style="color: #F0DCC8;">
-            Esta burger se entrega <strong style="color: #F0F0F0;">tal como es</strong>. No admite modificaciones en sus ingredientes.
+            Esta burger <strong style="color: #F0F0F0;">NO admite modificaciones</strong> en sus ingredientes.
           </p>
         </div>
 
