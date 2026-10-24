@@ -34,6 +34,9 @@ export const INGREDIENTS_DATA: IngredientMaster[] = [
     extraPrice: 0,
     canBeExtra: true,
     control: 'toggle',
+    // Por ahora solo se ofrece en hamburguesas. Para habilitarlo también en
+    // acompañamientos basta con borrar esta línea (o agregar 'acompañamientos').
+    extraCategories: ['hamburguesas'],
   },
 
   // ─── Personalizables con contador ───

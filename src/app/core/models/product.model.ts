@@ -1,5 +1,7 @@
 export type IngredientControl = 'counter' | 'toggle';
 
+export type ProductCategory = 'hamburguesas' | 'acompañamientos' | 'bebestibles';
+
 /**
  * Ingrediente en tiempo de ejecución (snapshot de receta + personalización).
  * Es la forma que consumen el modal, el carrito y WhatsApp.
@@ -31,6 +33,11 @@ export interface IngredientMaster {
   control: IngredientControl;
   /** Existe en la receta pero no se muestra en el modal (ej. pan). */
   hidden?: boolean;
+  /**
+   * Categorías de producto donde se ofrece como extra.
+   * Si se omite, se ofrece en todas. Ej. Pepinillos: solo 'hamburguesas'.
+   */
+  extraCategories?: ProductCategory[];
   /** Costo unitario de producción. NO es el precio de venta. */
   cost?: number;
 }
@@ -50,7 +57,25 @@ export interface SizeVariant {
   id: number;
   name: string;
   shortName: string;
+  /** Precio de venta individual de esta porción. */
   extraPrice: number;
+  /**
+   * Precio de esta porción cuando se incluye en un combo.
+   * Si se omite, el combo usa `extraPrice` (o el precio base del producto).
+   */
+  comboPrice?: number;
+  /**
+   * `true` = porción de uso interno (recetas/costos). No se ofrece en los
+   * selectores de venta ni en la personalización.
+   */
+  internal?: boolean;
+}
+
+/** Producto o porción que viene incluido en otro producto (ej. papas de una burger). */
+export interface IncludedProduct {
+  productoId: number;
+  varianteId?: number;
+  cantidad: number;
 }
 
 export interface Product {
@@ -58,11 +83,15 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  category: 'hamburguesas' | 'acompañamientos' | 'bebestibles';
+  /** Precio unitario cuando el producto se vende dentro de un combo. Si falta, se usa `price`. */
+  comboPrice?: number;
+  category: ProductCategory;
   image?: string;
   customizable: boolean;
   ingredients: Ingredient[];
   variants?: SizeVariant[];
   precioOferta?: number;
   allowExtras?: boolean;
+  /** Componentes incluidos que no se personalizan (para costos y BD). */
+  incluye?: IncludedProduct[];
 }

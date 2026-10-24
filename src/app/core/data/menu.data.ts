@@ -1,4 +1,5 @@
 import {
+  IncludedProduct,
   Ingredient,
   IngredientMaster,
   Product,
@@ -17,13 +18,23 @@ interface ProductReceta {
   description: string;
   price: number;
   precioOferta?: number;
+  comboPrice?: number;
   category: Product['category'];
   customizable: boolean;
   image?: string;
   allowExtras?: boolean;
   variants?: SizeVariant[];
+  incluye?: IncludedProduct[];
   recipe: RecipeLine[];
 }
+
+/**
+ * Porción de papas que acompaña a todas las burgers (100g).
+ * Es interna: no se vende ni se muestra, solo suma para costos e inventario.
+ */
+const PAPAS_BURGER: IncludedProduct[] = [
+  { productoId: 11, varianteId: 504, cantidad: 1 },
+];
 
 const INGREDIENT_BY_ID = new Map<number, IngredientMaster>(
   INGREDIENTS_DATA.map(i => [i.id, i])
@@ -65,6 +76,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     price: 4490,
     category: 'hamburguesas',
     customizable: true,
+    incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
       { ingredientId: 201, quantity: 1, isRequired: true },
@@ -78,6 +90,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     price: 5190,
     category: 'hamburguesas',
     customizable: true,
+    incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
       { ingredientId: 201, quantity: 1, isRequired: true },
@@ -93,6 +106,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     precioOferta: 3990,
     category: 'hamburguesas',
     customizable: true,
+    incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
       { ingredientId: 201, quantity: 1, isRequired: true },
@@ -108,6 +122,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     precioOferta: 3990,
     category: 'hamburguesas',
     customizable: true,
+    incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
       { ingredientId: 201, quantity: 1, isRequired: true },
@@ -119,10 +134,11 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     id: 5,
     name: 'Real de la casa',
     description: 'Medallón de 100g, cheddar americano, cebolla caramelizada, tocino ahumado y aritos de cebolla (x2)',
-    price: 6990,
+    price: 6690,
     precioOferta: 5990,
     category: 'hamburguesas',
     customizable: true,
+    incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
       { ingredientId: 201, quantity: 1, isRequired: true },
@@ -140,6 +156,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     precioOferta: 4690,
     category: 'hamburguesas',
     customizable: true,
+    incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
       { ingredientId: 201, quantity: 1, isRequired: true },
@@ -156,6 +173,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     precioOferta: 4690,
     category: 'hamburguesas',
     customizable: true,
+    incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
       { ingredientId: 201, quantity: 1, isRequired: true },
@@ -172,6 +190,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     precioOferta: 5190,
     category: 'hamburguesas',
     customizable: true,
+    incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
       { ingredientId: 201, quantity: 1, isRequired: true },
@@ -188,6 +207,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     precioOferta: 5190,
     category: 'hamburguesas',
     customizable: true,
+    incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
       { ingredientId: 201, quantity: 1, isRequired: true },
@@ -204,6 +224,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     precioOferta: 4590,
     category: 'hamburguesas',
     customizable: true,
+    incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
       { ingredientId: 201, quantity: 1, isRequired: true },
@@ -226,6 +247,8 @@ const PRODUCTS_RECETA: ProductReceta[] = [
       { id: 501, name: 'Porción Normal (150g)', shortName: '150g', extraPrice: 0 },
       { id: 502, name: 'Porción Mediana (250g)', shortName: '250g', extraPrice: 2990 },
       { id: 503, name: 'Porción Grande (300g)', shortName: '300g', extraPrice: 3990 },
+      // Uso interno: porción que acompaña a las burgers. No se vende ni se muestra.
+      { id: 504, name: 'Porción Burger (100g)', shortName: '100g', extraPrice: 0, comboPrice: 0, internal: true },
     ],
     recipe: [],
   },
@@ -239,9 +262,25 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     allowExtras: false,
     image: 'assets/images/aritos.webp',
     variants: [
-      { id: 601, name: 'Porción Normal (x5)', shortName: 'x5', extraPrice: 0 },
-      { id: 602, name: 'Porción Mediana (x10)', shortName: 'x10', extraPrice: 2390 },
-      { id: 603, name: 'Porción Grande (x15)', shortName: 'x15', extraPrice: 3590 },
+      { id: 601, name: 'Porción Normal (x5)', shortName: 'x5', extraPrice: 0, comboPrice: 1000 },
+      { id: 602, name: 'Porción Mediana (x10)', shortName: 'x10', extraPrice: 2390, comboPrice: 2000 },
+      { id: 603, name: 'Porción Grande (x15)', shortName: 'x15', extraPrice: 3590, comboPrice: 3000 },
+    ],
+    recipe: [],
+  },
+  {
+    id: 13,
+    name: 'Deditos de Pollo',
+    description: 'Porción de crujientes deditos de pollo para acompañar tu pedido',
+    price: 1690,
+    category: 'acompañamientos',
+    customizable: true,
+    allowExtras: false,
+    image: 'assets/images/aritos.webp',
+    variants: [
+      { id: 701, name: 'Porción Normal (x3)', shortName: 'x3', extraPrice: 0, comboPrice: 1500 },
+      { id: 702, name: 'Porción Mediana (x6)', shortName: 'x6', extraPrice: 3390, comboPrice: 3000 },
+      { id: 703, name: 'Porción Grande (x9)', shortName: 'x9', extraPrice: 5090, comboPrice: 4500 },
     ],
     recipe: [],
   },
@@ -252,6 +291,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     name: 'Coca-Cola 350ml',
     description: 'Lata fría de Coca-Cola',
     price: 1500,
+    comboPrice: 1000,
     category: 'bebestibles',
     customizable: false,
     recipe: [],
@@ -261,6 +301,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     name: 'Fanta 350ml',
     description: 'Lata fría de Fanta',
     price: 1500,
+    comboPrice: 1000,
     category: 'bebestibles',
     customizable: false,
     recipe: [],
@@ -270,6 +311,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     name: 'Sprite 350ml',
     description: 'Lata fría de Sprite',
     price: 1500,
+    comboPrice: 1000,
     category: 'bebestibles',
     customizable: false,
     recipe: [],
@@ -279,6 +321,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     name: 'Agua Gasificada 500cc',
     description: 'Agua mineral alcalina con gas',
     price: 1200,
+    comboPrice: 1000,
     category: 'bebestibles',
     customizable: false,
     recipe: [],
@@ -288,6 +331,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     name: 'Jugo Jumex Piña Coco',
     description: 'Refrescante néctar de fruta en lata.',
     price: 1200,
+    comboPrice: 1000,
     category: 'bebestibles',
     customizable: false,
     recipe: [],

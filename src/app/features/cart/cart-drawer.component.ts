@@ -269,7 +269,7 @@ export class CartDrawerComponent implements OnDestroy {
           texto += ` (x${d.cantidad})`;
         }
 
-        if (!d.requiereSeleccion && d.varianteSeleccionada) {
+        if (!d.requiereSeleccion && d.varianteSeleccionada && !d.ocultarVariante) {
           texto += ` (${d.varianteSeleccionada.shortName})`;
         }
 

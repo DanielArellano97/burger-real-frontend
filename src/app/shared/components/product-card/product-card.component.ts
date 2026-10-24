@@ -252,8 +252,9 @@ export class ProductCardComponent {
 
   add(): void {
     const product = this.product();
+    const variants = (product.variants ?? []).filter(v => !v.internal);
 
-    if (!product.variants || product.variants.length === 0) {
+    if (variants.length === 0) {
       this.cartService.addItem(product, [], product.price);
       this.notification.show(product.name);
       return;
@@ -264,7 +265,7 @@ export class ProductCardComponent {
       {
         data: {
           productName: product.name,
-          opciones: product.variants,
+          opciones: variants,
         },
         backdropClass: 'burger-dialog-backdrop',
         panelClass: 'burger-modal-pane',

@@ -44,7 +44,7 @@ export interface ComboDetailModalData {
         <p class="font-body text-xs font-semibold uppercase tracking-wider mb-3" style="color: #888;">
           📋 Este combo incluye
         </p>
-        @for (detalle of data.combo.detalles; track detalle.productoId) {
+        @for (detalle of data.combo.detalles; track $index) {
           <div
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl"
             style="background: #242424; border: 1px solid #2A2A2A;"
@@ -53,7 +53,7 @@ export interface ComboDetailModalData {
             <div class="flex-1">
               <p class="font-heading font-semibold text-sm text-brand-white">
   {{ detalle.cantidad > 1 ? detalle.cantidad + 'x ' : '' }}{{ detalle.productoNombre }}
-  @if (detalle.varianteSeleccionada) {
+  @if (detalle.varianteSeleccionada && !detalle.ocultarVariante) {
     <span style="color: #888; font-weight: 400;"> ({{ detalle.varianteSeleccionada.shortName }})</span>
   }
   @if (detalle.requiereSeleccion) {

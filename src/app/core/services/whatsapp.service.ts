@@ -64,7 +64,7 @@ export class WhatsappService {
 
           if (d.cantidad > 1) linea += ` x${d.cantidad}`;
 
-          if (!d.requiereSeleccion && d.varianteSeleccionada) {
+          if (!d.requiereSeleccion && d.varianteSeleccionada && !d.ocultarVariante) {
             linea += ` (${d.varianteSeleccionada.shortName})`;
           }
 

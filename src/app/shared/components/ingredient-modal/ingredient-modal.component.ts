@@ -47,13 +47,13 @@ export interface IngredientModalResult {
       <div class="flex-1 overflow-y-auto px-5 py-4 modal-scroll" role="list" aria-label="Ingredientes">
 
         <!-- Selector de variantes -->
-        @if (data.product.variants && data.product.variants.length > 0) {
+        @if (visibleVariants().length > 0) {
           <div class="mb-4">
             <p
               style="color: #F0DCC8; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;"
             >Elige tu tamaño</p>
             <div class="flex gap-2 flex-wrap mt-2">
-              @for (variant of data.product.variants; track variant.id) {
+              @for (variant of visibleVariants(); track variant.id) {
                 <button
                   (click)="selectedVariant.set(variant)"
                   class="flex flex-col items-center justify-center rounded-lg transition-colors"
@@ -267,6 +267,11 @@ export class IngredientModalComponent {
 
   isAccompaniment = computed(() => this.data.product.category === 'acompañamientos');
 
+  /** Variantes vendibles: excluye las porciones internas (ej. papas 100g de las burgers). */
+  visibleVariants = computed(() =>
+    (this.data.product.variants ?? []).filter(v => !v.internal)
+  );
+
   headerTitle = computed(() =>
     this.isAccompaniment() ? 'Personaliza tu Acompañamiento' : 'Personaliza tu Burger'
   );
@@ -278,8 +283,8 @@ export class IngredientModalComponent {
   );
 
   private getDefaultVariant(): SizeVariant | undefined {
-    const variants = this.data.product.variants;
-    if (!variants || variants.length === 0) return undefined;
+    const variants = this.visibleVariants();
+    if (variants.length === 0) return undefined;
     if (this.isAccompaniment()) {
       return variants[0];
     }
@@ -312,6 +317,10 @@ export class IngredientModalComponent {
 
     return this.productoService.extrasCatalog
       .filter(master => !excluded.has(master.id))
+      .filter(master =>
+        !master.extraCategories ||
+        master.extraCategories.includes(this.data.product.category)
+      )
       .map(master => ({
         id: master.id,
         name: master.name,
