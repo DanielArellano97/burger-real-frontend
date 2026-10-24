@@ -289,6 +289,15 @@ export const MENU_DATA: Product[] = [
     customizable: false,
     ingredients: [],
   },
+  {
+    id: 37,
+    name: 'Pepinillos',
+    description: 'Los verdes infaltables, ¿o si?',
+    price: 0,
+    category: 'extras',
+    customizable: false,
+    ingredients: [],
+  },
 ];
 
 export const CATEGORIES = [

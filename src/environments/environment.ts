@@ -1,6 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8080',
   whatsappNumber: '56965981441',
   localName: 'Burger Real',
   bankDetails: {

@@ -202,7 +202,7 @@ export interface IngredientModalResult {
       <div class="flex-shrink-0 px-5 pt-4 pb-5 border-t space-y-3" style="border-color: #2A2A2A;">
         <!-- Price preview -->
         <div class="flex items-center justify-between rounded-lg px-3 py-2.5" style="background: #111;">
-          <span class="font-body text-sm" style="color: #888;">Precio unitario</span>
+          <span class="font-body text-sm" style="color: #888;">{{ priceLabel() }}</span>
           <div class="flex items-center gap-2">
             @if (showStrikeThrough()) {
               <span class="font-body text-sm line-through" style="color: #555;">{{ formatPrice(strikeThroughPrice()) }}</span>
@@ -281,14 +281,36 @@ export class IngredientModalComponent {
   included = computed(() => this.ingredients().filter(i => i.defaultQuantity > 0));
 
   dynamicExtras = computed<Ingredient[]>(() => {
+    const allIngredients = this.productoService.allIngredients();
     const excluded = this.includedIds();
-    return this.productoService.allIngredients()
-      .filter(i => !excluded.has(i.id))
+
+    // 1. Buscamos específicamente los pepinillos en la lista global (por nombre)
+    const pepinillos = allIngredients.find(i => i.name.toLowerCase().includes('Pepinillos'));
+
+    // 2. Filtramos el resto de extras normales (excluyendo los ya incluidos y también los pepinillos para no duplicarlos)
+    const otherExtras = allIngredients
+      .filter(i => !excluded.has(i.id) && !i.name.toLowerCase().includes('Pepinillos'))
       .map(i => ({
         ...i,
         defaultQuantity: 0,
         currentQuantity: this.extraQuantities().get(i.id) ?? 0,
       }));
+
+    const result: Ingredient[] = [];
+
+    // 3. Si los pepinillos existen globalmente, los metemos SIEMPRE y primero al inicio
+    if (pepinillos) {
+      result.push({
+        ...pepinillos,
+        defaultQuantity: 0,
+        currentQuantity: this.extraQuantities().get(pepinillos.id) ?? 0,
+      });
+    }
+
+    // 4. Agregamos el resto de los extras debajo
+    result.push(...otherExtras);
+
+    return result;
   });
 
   activeOptionalCount = computed(() =>
@@ -372,6 +394,16 @@ export class IngredientModalComponent {
   });
 
   allowExtras = computed(() => this.data.product.allowExtras ?? true);
+
+  priceLabel = computed(() => {
+    const name = this.data.product.name.toLowerCase();
+
+    if (name.includes('papas') || name.includes('fritas')) return 'Precio Papitas';
+    if (name.includes('aritos')) return 'Precio Aritos';
+    if (name.includes('deditos') || name.includes('pollo')) return 'Precio Deditos';
+    
+    return 'Precio Burger';
+  });
 
   private buildExtraQuantities(): Map<number, number> {
     const map = new Map<number, number>();
