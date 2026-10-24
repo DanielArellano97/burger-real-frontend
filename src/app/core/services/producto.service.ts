@@ -1,19 +1,21 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { MENU_DATA } from '../data/menu.data'; // Ajusta la ruta según donde tengas tu archivo de mock
-import { Ingredient, Product } from '../models/product.model';
+import { MENU_DATA } from '../data/menu.data';
+import { INGREDIENTS_DATA } from '../data/ingredients.data';
+import { IngredientMaster, Product } from '../models/product.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProductoService {
 
-  private _products       = signal<Product[]>([]);
-  private _allIngredients = signal<Ingredient[]>([]);
-  private _loading        = signal(false);
-  private _error          = signal<string | null>(null);
+  private _products = signal<Product[]>([]);
+  private _loading  = signal(false);
+  private _error    = signal<string | null>(null);
 
-  products       = this._products.asReadonly();
-  allIngredients = this._allIngredients.asReadonly();
-  loading        = this._loading.asReadonly();
-  error          = this._error.asReadonly();
+  products = this._products.asReadonly();
+  loading  = this._loading.asReadonly();
+  error    = this._error.asReadonly();
+
+  /** Extras disponibles para personalizar: salen del catálogo maestro, no de las recetas. */
+  readonly extrasCatalog: readonly IngredientMaster[] = INGREDIENTS_DATA.filter(i => i.canBeExtra);
 
   hamburguesas    = computed(() => this._products().filter(p => p.category === 'hamburguesas'));
   acompañamientos = computed(() => this._products().filter(p => p.category === 'acompañamientos'));
@@ -25,20 +27,7 @@ export class ProductoService {
 
     setTimeout(() => {
       try {
-        const products = MENU_DATA;
-
-        // Extraemos todos los ingredientes únicos que permiten agregarse/modificarse para los modales
-        const ingredientMap = new Map<number | string, Ingredient>();
-        products.forEach(p => {
-          p.ingredients.forEach(i => {
-            if (!ingredientMap.has(i.id)) {
-              ingredientMap.set(i.id, { ...i });
-            }
-          });
-        });
-
-        this._allIngredients.set(Array.from(ingredientMap.values()));
-        this._products.set(products);
+        this._products.set(MENU_DATA);
         this._loading.set(false);
       } catch (err) {
         console.error('Error cargando mock de productos:', err);

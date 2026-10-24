@@ -1,6 +1,62 @@
-import { Product } from '../models/product.model';
+import {
+  Ingredient,
+  IngredientMaster,
+  Product,
+  RecipeLine,
+  SizeVariant,
+} from '../models/product.model';
+import { INGREDIENTS_DATA } from './ingredients.data';
 
-export const MENU_DATA: Product[] = [
+/**
+ * Producto en formato "receta": referencia ingredientes del catálogo maestro
+ * en vez de duplicar nombre y precio en cada hamburguesa.
+ */
+interface ProductReceta {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  precioOferta?: number;
+  category: Product['category'];
+  customizable: boolean;
+  image?: string;
+  allowExtras?: boolean;
+  variants?: SizeVariant[];
+  recipe: RecipeLine[];
+}
+
+const INGREDIENT_BY_ID = new Map<number, IngredientMaster>(
+  INGREDIENTS_DATA.map(i => [i.id, i])
+);
+
+/**
+ * Expande una receta al snapshot que consumen el modal, el carrito y WhatsApp.
+ * Si un id no existe en el catálogo maestro, falla en build/arranque en vez de
+ * mostrar un ingrediente incompleto en producción.
+ */
+function buildIngredients(recipe: RecipeLine[]): Ingredient[] {
+  return recipe.map(({ ingredientId, quantity, isRequired }) => {
+    const master = INGREDIENT_BY_ID.get(ingredientId);
+
+    if (!master) {
+      throw new Error(`Ingrediente ${ingredientId} no existe en INGREDIENTS_DATA`);
+    }
+
+    return {
+      id: master.id,
+      name: master.name,
+      defaultQuantity: quantity,
+      currentQuantity: quantity,
+      extraPrice: master.extraPrice,
+      isRequired: isRequired ?? false,
+      canBeExtra: master.canBeExtra,
+      control: master.control,
+      hidden: master.hidden,
+    };
+  });
+}
+
+const PRODUCTS_RECETA: ProductReceta[] = [
   // ─── Hamburguesas ───
   {
     id: 1,
@@ -9,9 +65,10 @@ export const MENU_DATA: Product[] = [
     price: 4490,
     category: 'hamburguesas',
     customizable: true,
-    ingredients: [
-      { id: 201, name: 'Medallón de Vacuno',    defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
-      { id: 202, name: 'Cheddar Americano',                 defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
+    recipe: [
+      { ingredientId: 200, quantity: 1, isRequired: true },
+      { ingredientId: 201, quantity: 1, isRequired: true },
+      { ingredientId: 202, quantity: 1 },
     ],
   },
   {
@@ -21,10 +78,11 @@ export const MENU_DATA: Product[] = [
     price: 5190,
     category: 'hamburguesas',
     customizable: true,
-    ingredients: [
-      { id: 201, name: 'Medallón de Vacuno',    defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
-      { id: 202, name: 'Cheddar Americano',                 defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
-      { id: 203, name: 'Tocino Ahumado',                 defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+    recipe: [
+      { ingredientId: 200, quantity: 1, isRequired: true },
+      { ingredientId: 201, quantity: 1, isRequired: true },
+      { ingredientId: 202, quantity: 1 },
+      { ingredientId: 203, quantity: 1 },
     ],
   },
   {
@@ -32,13 +90,14 @@ export const MENU_DATA: Product[] = [
     name: 'Onion Caramel',
     description: 'Medallón 100g, cheddar americano y cebolla caramelizada',
     price: 4990,
-    precioOferta: 3990, // <--- ¡Agregamos esto para activar el banner y el botón!
+    precioOferta: 3990,
     category: 'hamburguesas',
     customizable: true,
-    ingredients: [
-      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
-      { id: 202, name: 'Cheddar Americano',      defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
-      { id: 204, name: 'Cebolla Caramelizada',         defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+    recipe: [
+      { ingredientId: 200, quantity: 1, isRequired: true },
+      { ingredientId: 201, quantity: 1, isRequired: true },
+      { ingredientId: 202, quantity: 1 },
+      { ingredientId: 204, quantity: 1 },
     ],
   },
   {
@@ -46,13 +105,14 @@ export const MENU_DATA: Product[] = [
     name: 'Onion Ring',
     description: 'Medallón 100g, cheddar americano y aritos de cebolla (x2)',
     price: 4990,
-    precioOferta: 3990, // <--- ¡Agregamos esto para activar el banner y el botón!
+    precioOferta: 3990,
     category: 'hamburguesas',
     customizable: true,
-    ingredients: [
-      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
-      { id: 202, name: 'Cheddar Americano',      defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
-      { id: 205, name: 'Aritos de Cebolla (x2)',         defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
+    recipe: [
+      { ingredientId: 200, quantity: 1, isRequired: true },
+      { ingredientId: 201, quantity: 1, isRequired: true },
+      { ingredientId: 202, quantity: 1 },
+      { ingredientId: 205, quantity: 1 },
     ],
   },
   {
@@ -60,131 +120,131 @@ export const MENU_DATA: Product[] = [
     name: 'Real de la casa',
     description: 'Medallón de 100g, cheddar americano, cebolla caramelizada, tocino ahumado y aritos de cebolla (x2)',
     price: 6990,
-    precioOferta: 5990, // <--- ¡Agregamos esto para activar el banner y el botón!
+    precioOferta: 5990,
     category: 'hamburguesas',
     customizable: true,
-    ingredients: [
-      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
-      { id: 202, name: 'Cheddar Americano',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
-      { id: 204, name: 'Cebolla Caramelizada',             defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
-      { id: 203, name: 'Tocino Ahumado',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
-      { id: 205, name: 'Aritos de Cebolla (x2)',               defaultQuantity: 1, currentQuantity: 1, extraPrice: 800 },
-    ]
+    recipe: [
+      { ingredientId: 200, quantity: 1, isRequired: true },
+      { ingredientId: 201, quantity: 1, isRequired: true },
+      { ingredientId: 202, quantity: 1 },
+      { ingredientId: 204, quantity: 1 },
+      { ingredientId: 203, quantity: 1 },
+      { ingredientId: 205, quantity: 1 },
+    ],
   },
   {
     id: 6,
     name: 'Onion Caramel Bacon',
     description: 'Medallón de 100g, cheddar americano, cebolla caramelizada y tocino ahumado',
     price: 5690,
-    precioOferta: 4690, // <--- ¡Agregamos esto para activar el banner y el botón!
+    precioOferta: 4690,
     category: 'hamburguesas',
     customizable: true,
-    ingredients: [
-      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
-      { id: 202, name: 'Cheddar Americano',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
-      { id: 204, name: 'Cebolla Caramelizada',             defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
-      { id: 203, name: 'Tocino Ahumado',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
-    ]
+    recipe: [
+      { ingredientId: 200, quantity: 1, isRequired: true },
+      { ingredientId: 201, quantity: 1, isRequired: true },
+      { ingredientId: 202, quantity: 1 },
+      { ingredientId: 204, quantity: 1 },
+      { ingredientId: 203, quantity: 1 },
+    ],
   },
   {
     id: 7,
     name: 'Onion Ring Bacon',
     description: 'Medallón de 100g, cheddar americano, tocino ahumado y aritos de cebolla (x2)',
     price: 5690,
-    precioOferta: 4690, // <--- ¡Agregamos esto para activar el banner y el botón!
+    precioOferta: 4690,
     category: 'hamburguesas',
     customizable: true,
-    ingredients: [
-      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
-      { id: 202, name: 'Cheddar Americano',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
-      { id: 203, name: 'Tocino Ahumado',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
-      { id: 205, name: 'Aritos de Cebolla (x2)',               defaultQuantity: 1, currentQuantity: 1, extraPrice: 800 },
-    ]
+    recipe: [
+      { ingredientId: 200, quantity: 1, isRequired: true },
+      { ingredientId: 201, quantity: 1, isRequired: true },
+      { ingredientId: 202, quantity: 1 },
+      { ingredientId: 203, quantity: 1 },
+      { ingredientId: 205, quantity: 1 },
+    ],
   },
   {
     id: 8,
     name: 'Avocado Bacon',
     description: 'Medallón de 100g, cheddar americano, tocino ahumado y palta',
     price: 6190,
-    precioOferta: 5190, // <--- ¡Agregamos esto para activar el banner y el botón!
+    precioOferta: 5190,
     category: 'hamburguesas',
     customizable: true,
-    ingredients: [
-      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
-      { id: 202, name: 'Cheddar Americano',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
-      { id: 203, name: 'Tocino Ahumado',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
-      { id: 206, name: 'Palta',               defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
-    ]
+    recipe: [
+      { ingredientId: 200, quantity: 1, isRequired: true },
+      { ingredientId: 201, quantity: 1, isRequired: true },
+      { ingredientId: 202, quantity: 1 },
+      { ingredientId: 203, quantity: 1 },
+      { ingredientId: 206, quantity: 1 },
+    ],
   },
   {
     id: 9,
     name: 'Avocado Egg',
     description: 'Medallón de 100g, cheddar americano, palta y huevo frito',
     price: 6190,
-    precioOferta: 5190, // <--- ¡Agregamos esto para activar el banner y el botón!
+    precioOferta: 5190,
     category: 'hamburguesas',
     customizable: true,
-    ingredients: [
-      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
-      { id: 202, name: 'Cheddar Americano',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
-      { id: 206, name: 'Palta',               defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
-      { id: 207, name: 'Huevo Frito',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
-    ]
+    recipe: [
+      { ingredientId: 200, quantity: 1, isRequired: true },
+      { ingredientId: 201, quantity: 1, isRequired: true },
+      { ingredientId: 202, quantity: 1 },
+      { ingredientId: 206, quantity: 1 },
+      { ingredientId: 207, quantity: 1 },
+    ],
   },
   {
     id: 10,
     name: 'La Trilogía del Rey (by @selvaenlaluna)',
     description: 'Medallón de 100g, cheddar americano, cebolla caramelizada y huevo frito',
     price: 5590,
-    precioOferta: 4590, // <--- ¡Agregamos esto para activar el banner y el botón!
+    precioOferta: 4590,
     category: 'hamburguesas',
     customizable: true,
-    ingredients: [
-      { id: 201, name: 'Medallón de Vacuno', defaultQuantity: 1, currentQuantity: 1, extraPrice: 1500, isRequired: true },
-      { id: 202, name: 'Cheddar Americano',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 600 },
-      { id: 204, name: 'Cebolla Caramelizada',             defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
-      { id: 207, name: 'Huevo Frito',            defaultQuantity: 1, currentQuantity: 1, extraPrice: 1000 },
-    ]
+    recipe: [
+      { ingredientId: 200, quantity: 1, isRequired: true },
+      { ingredientId: 201, quantity: 1, isRequired: true },
+      { ingredientId: 202, quantity: 1 },
+      { ingredientId: 204, quantity: 1 },
+      { ingredientId: 207, quantity: 1 },
+    ],
   },
 
-
-
-
-  //─── Acompañamientos ───
+  // ─── Acompañamientos ───
   {
-    id: 11, // ID único numérico o string
+    id: 11,
     name: 'Papas Fritas Reales',
     description: 'Ricas papitas caseras acompañadas con salsa de la casa',
-    price: 1990, // Precio base (el que acompaña al "desde")
-    category: 'acompañamientos', // <--- ¡OBLIGATORIO! Debe coincidir exactamente con este string (con la 'ñ')
-    customizable: true, // Idealmente true para que permita elegir porciones/variantes
-    image: 'assets/images/papas.webp', // O una URL de Unsplash
-    variants: [         // Las opciones de porción que se abrirán en el modal
+    price: 1990,
+    category: 'acompañamientos',
+    customizable: true,
+    image: 'assets/images/papas.webp',
+    variants: [
       { id: 501, name: 'Porción Normal (150g)', shortName: '150g', extraPrice: 0 },
       { id: 502, name: 'Porción Mediana (250g)', shortName: '250g', extraPrice: 2990 },
       { id: 503, name: 'Porción Grande (300g)', shortName: '300g', extraPrice: 3990 },
     ],
-    ingredients: [], // O los ingredientes si se pueden personalizar
+    recipe: [],
   },
   {
-    id: 12, // ID único numérico o string
+    id: 12,
     name: 'Aritos de Cebolla',
     description: 'Porción de crujientes aritos de cebolla para acompañar tu pedido',
-    price: 1190, // Precio base (el que acompaña al "desde")
-    category: 'acompañamientos', // <--- ¡OBLIGATORIO! Debe coincidir exactamente con este string (con la 'ñ')
-    customizable: true, // Idealmente true para que permita elegir porciones/variantes
-    allowExtras: false, // <--- ¡Con esto ocultas la sección de extras!
-    image: 'assets/images/aritos.webp', // O una URL de Unsplash
-    variants: [         // Las opciones de porción que se abrirán en el modal
+    price: 1190,
+    category: 'acompañamientos',
+    customizable: true,
+    allowExtras: false,
+    image: 'assets/images/aritos.webp',
+    variants: [
       { id: 601, name: 'Porción Normal (x5)', shortName: 'x5', extraPrice: 0 },
       { id: 602, name: 'Porción Mediana (x10)', shortName: 'x10', extraPrice: 2390 },
       { id: 603, name: 'Porción Grande (x15)', shortName: 'x15', extraPrice: 3590 },
     ],
-    ingredients: [], // O los ingredientes si se pueden personalizar
+    recipe: [],
   },
-
-
-
 
   // ─── Bebestibles ───
   {
@@ -194,7 +254,7 @@ export const MENU_DATA: Product[] = [
     price: 1500,
     category: 'bebestibles',
     customizable: false,
-    ingredients: [],
+    recipe: [],
   },
   {
     id: 22,
@@ -203,7 +263,7 @@ export const MENU_DATA: Product[] = [
     price: 1500,
     category: 'bebestibles',
     customizable: false,
-    ingredients: [],
+    recipe: [],
   },
   {
     id: 23,
@@ -212,7 +272,7 @@ export const MENU_DATA: Product[] = [
     price: 1500,
     category: 'bebestibles',
     customizable: false,
-    ingredients: [],
+    recipe: [],
   },
   {
     id: 24,
@@ -221,7 +281,7 @@ export const MENU_DATA: Product[] = [
     price: 1200,
     category: 'bebestibles',
     customizable: false,
-    ingredients: [],
+    recipe: [],
   },
   {
     id: 25,
@@ -230,75 +290,14 @@ export const MENU_DATA: Product[] = [
     price: 1200,
     category: 'bebestibles',
     customizable: false,
-    ingredients: [],
-  },
-
-  // ─── Extras ───
-  
-  {
-    id: 31,
-    name: 'Bacon Extra',
-    description: 'Tira de bacon crocante adicional',
-    price: 1500,
-    category: 'extras',
-    customizable: false,
-    ingredients: [],
-  },
-  {
-    id: 32,
-    name: 'Queso Cheddar',
-    description: 'Lámina adicional de queso cheddar fundido',
-    price: 600,
-    category: 'extras',
-    customizable: false,
-    ingredients: [],
-  },
-  {
-    id: 33,
-    name: 'Huevo Frito',
-    description: 'Huevo frito sobre tu hamburguesa',
-    price: 1000,
-    category: 'extras',
-    customizable: false,
-    ingredients: [],
-  },
-  {
-    id: 34,
-    name: 'Aritos de Cebolla (x2)',
-    description: 'Par de Aritos de Cebolla para tu hamburguesa',
-    price: 1000,
-    category: 'extras',
-    customizable: false,
-    ingredients: [],
-  },
-  {
-    id: 35,
-    name: 'Cebolla Caramelizada',
-    description: 'Cebolla Caramelizada Real para tu hamburguesa',
-    price: 1000,
-    category: 'extras',
-    customizable: false,
-    ingredients: [],
-  },
-  {
-    id: 36,
-    name: 'Palta',
-    description: 'La Reina Verde para tu hamburguesa',
-    price: 1000,
-    category: 'extras',
-    customizable: false,
-    ingredients: [],
-  },
-  {
-    id: 37,
-    name: 'Pepinillos',
-    description: 'Los verdes infaltables, ¿o si?',
-    price: 0,
-    category: 'extras',
-    customizable: false,
-    ingredients: [],
+    recipe: [],
   },
 ];
+
+export const MENU_DATA: Product[] = PRODUCTS_RECETA.map(({ recipe, ...product }) => ({
+  ...product,
+  ingredients: buildIngredients(recipe),
+}));
 
 export const CATEGORIES = [
   { key: 'hamburguesas',    label: 'Hamburguesas',    emoji: '🍔' },

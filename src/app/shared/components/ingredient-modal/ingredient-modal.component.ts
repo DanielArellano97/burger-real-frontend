@@ -166,31 +166,52 @@ export interface IngredientModalResult {
                   >+{{ formatPrice(extra.currentQuantity * extra.extraPrice) }}</span>
                 }
 
-                <div class="flex items-center gap-1.5 flex-shrink-0" role="group" [attr.aria-label]="'Cantidad de ' + extra.name">
+                @if (extra.control === 'toggle') {
                   <button
-                    (click)="adjustExtra(extra.id, -1)"
-                    [disabled]="extra.currentQuantity === 0"
-                    class="w-8 h-8 flex items-center justify-center rounded-lg font-bold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                    style="background: #242424; color: #F0F0F0;"
-                    [attr.aria-label]="'Reducir ' + extra.name"
+                    type="button"
+                    role="switch"
+                    [attr.aria-checked]="extra.currentQuantity > 0"
+                    (click)="toggleExtra(extra.id)"
+                    class="relative flex-shrink-0 rounded-full transition-colors"
+                    style="width: 44px; height: 24px;"
+                    [style.background]="extra.currentQuantity > 0 ? '#F07800' : '#242424'"
+                    [style.border]="extra.currentQuantity > 0 ? '1px solid #F07800' : '1px solid #3A3A3A'"
+                    [attr.aria-label]="extra.name + (extra.currentQuantity > 0 ? ': agregado' : ': no agregado')"
                   >
-                    <svg lucideMinus class="w-3.5 h-3.5" aria-hidden="true"></svg>
+                    <span
+                      class="absolute rounded-full transition-transform"
+                      style="top: 2px; left: 2px; width: 18px; height: 18px;"
+                      [style.background]="extra.currentQuantity > 0 ? '#0F0F0F' : '#888'"
+                      [style.transform]="extra.currentQuantity > 0 ? 'translateX(20px)' : 'translateX(0)'"
+                    ></span>
                   </button>
-                  <span
-                    class="w-7 text-center font-heading font-bold text-sm"
-                    [style.color]="extra.currentQuantity > 0 ? '#F07800' : '#555'"
-                    aria-live="polite"
-                  >{{ extra.currentQuantity }}</span>
-                  <button
-                    (click)="adjustExtra(extra.id, 1)"
-                    [disabled]="extra.currentQuantity >= 5"
-                    class="w-8 h-8 flex items-center justify-center rounded-lg font-bold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                    style="background: #242424; color: #F0F0F0;"
-                    [attr.aria-label]="'Agregar más ' + extra.name"
-                  >
-                    <svg lucidePlus class="w-3.5 h-3.5" aria-hidden="true"></svg>
-                  </button>
-                </div>
+                } @else {
+                  <div class="flex items-center gap-1.5 flex-shrink-0" role="group" [attr.aria-label]="'Cantidad de ' + extra.name">
+                    <button
+                      (click)="adjustExtra(extra.id, -1)"
+                      [disabled]="extra.currentQuantity === 0"
+                      class="w-8 h-8 flex items-center justify-center rounded-lg font-bold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      style="background: #242424; color: #F0F0F0;"
+                      [attr.aria-label]="'Reducir ' + extra.name"
+                    >
+                      <svg lucideMinus class="w-3.5 h-3.5" aria-hidden="true"></svg>
+                    </button>
+                    <span
+                      class="w-7 text-center font-heading font-bold text-sm"
+                      [style.color]="extra.currentQuantity > 0 ? '#F07800' : '#555'"
+                      aria-live="polite"
+                    >{{ extra.currentQuantity }}</span>
+                    <button
+                      (click)="adjustExtra(extra.id, 1)"
+                      [disabled]="extra.currentQuantity >= 5"
+                      class="w-8 h-8 flex items-center justify-center rounded-lg font-bold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      style="background: #242424; color: #F0F0F0;"
+                      [attr.aria-label]="'Agregar más ' + extra.name"
+                    >
+                      <svg lucidePlus class="w-3.5 h-3.5" aria-hidden="true"></svg>
+                    </button>
+                  </div>
+                }
               </div>
             }
           }
@@ -278,39 +299,28 @@ export class IngredientModalComponent {
     new Set(this.ingredients().map(i => i.id))
   );
 
-  included = computed(() => this.ingredients().filter(i => i.defaultQuantity > 0));
+  included = computed(() =>
+    this.ingredients().filter(i => i.defaultQuantity > 0 && !i.hidden)
+  );
 
+  /**
+   * Extras = catálogo maestro filtrado por `canBeExtra`, menos los que esta
+   * hamburguesa ya trae en su receta.
+   */
   dynamicExtras = computed<Ingredient[]>(() => {
-    const allIngredients = this.productoService.allIngredients();
     const excluded = this.includedIds();
 
-    // 1. Buscamos específicamente los pepinillos en la lista global (por nombre)
-    const pepinillos = allIngredients.find(i => i.name.toLowerCase().includes('Pepinillos'));
-
-    // 2. Filtramos el resto de extras normales (excluyendo los ya incluidos y también los pepinillos para no duplicarlos)
-    const otherExtras = allIngredients
-      .filter(i => !excluded.has(i.id) && !i.name.toLowerCase().includes('Pepinillos'))
-      .map(i => ({
-        ...i,
+    return this.productoService.extrasCatalog
+      .filter(master => !excluded.has(master.id))
+      .map(master => ({
+        id: master.id,
+        name: master.name,
+        extraPrice: master.extraPrice,
+        canBeExtra: master.canBeExtra,
+        control: master.control,
         defaultQuantity: 0,
-        currentQuantity: this.extraQuantities().get(i.id) ?? 0,
+        currentQuantity: this.extraQuantities().get(master.id) ?? 0,
       }));
-
-    const result: Ingredient[] = [];
-
-    // 3. Si los pepinillos existen globalmente, los metemos SIEMPRE y primero al inicio
-    if (pepinillos) {
-      result.push({
-        ...pepinillos,
-        defaultQuantity: 0,
-        currentQuantity: this.extraQuantities().get(pepinillos.id) ?? 0,
-      });
-    }
-
-    // 4. Agregamos el resto de los extras debajo
-    result.push(...otherExtras);
-
-    return result;
   });
 
   activeOptionalCount = computed(() =>
@@ -437,6 +447,14 @@ export class IngredientModalComponent {
     this.extraQuantities.update(map => {
       const current = map.get(extraId) ?? 0;
       return new Map(map).set(extraId, Math.max(0, Math.min(5, current + delta)));
+    });
+  }
+
+  /** Extras booleanos (ej. Pepinillos, salsas): alternan entre 0 y 1. */
+  toggleExtra(extraId: number): void {
+    this.extraQuantities.update(map => {
+      const isActive = (map.get(extraId) ?? 0) > 0;
+      return new Map(map).set(extraId, isActive ? 0 : 1);
     });
   }
 
