@@ -3,12 +3,14 @@ import {
   AfterViewInit, OnDestroy, OnInit, ChangeDetectionStrategy,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { fromEvent } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Dialog } from '@angular/cdk/dialog';
 import { CATEGORIES } from '../../core/data/menu.data';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 import { CartService } from '../../core/services/cart.service';
 import { Combo, ComboDetalle } from '../../core/models/combo.model';
+import { BurgerEnOferta, burgerDelDia, esDiaDeOferta } from '../../core/utils/burger-of-the-week';
 import { Product, SizeVariant } from '../../core/models/product.model';
 import { ComboModalComponent, ComboModalData, ComboModalResult } from '../../shared/components/combo-modal/combo-modal.component';
 import { BurgerOfTheWeekModalComponent, BurgerOfTheWeekModalData, BurgerOfTheWeekModalResult } from '../../shared/components/burger-of-the-week-modal/burger-of-the-week-modal.component';
@@ -42,16 +44,16 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
   loading = this.productoService.loading;
   error   = this.productoService.error;
 
-  burgerOfTheWeek = computed<Product | null>(() => {
-    const burgers = this.productoService.hamburguesas();
-    if (burgers.length === 0) return null;
-    const now = new Date();
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-    const weekNumber = Math.ceil(
-      ((now.getTime() - startOfYear.getTime()) / 86400000 + startOfYear.getDay() + 1) / 7
-    );
-    return burgers[(weekNumber - 1) % burgers.length];
-  });
+  /** Fecha actual; se actualiza al cruzar la medianoche o al volver a la pestaña. */
+  private hoy = signal(new Date());
+  private midnightTimer?: ReturnType<typeof setTimeout>;
+
+  burgerOfTheWeek = computed<BurgerEnOferta | null>(() =>
+    burgerDelDia(this.productoService.hamburguesas(), this.hoy())
+  );
+
+  /** Solo lunes a jueves se muestra el precio de oferta y el botón Agregar. */
+  ofertaActiva = computed(() => esDiaDeOferta(this.hoy()));
 
   private observers: IntersectionObserver[] = [];
 
@@ -61,6 +63,28 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
         setTimeout(() => this.setupSectionObservers());
       }
     });
+
+    this.programarCambioDeDia();
+
+    // Si la pestaña estuvo en segundo plano, el timer puede llegar tarde.
+    fromEvent(document, 'visibilitychange')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (!document.hidden) this.hoy.set(new Date());
+      });
+  }
+
+  /** Reevalúa la fecha al cruzar la medianoche. */
+  private programarCambioDeDia(): void {
+    const ahora = new Date();
+    const proximoDia = new Date(
+      ahora.getFullYear(), ahora.getMonth(), ahora.getDate() + 1, 0, 0, 1
+    );
+
+    this.midnightTimer = setTimeout(() => {
+      this.hoy.set(new Date());
+      this.programarCambioDeDia();
+    }, proximoDia.getTime() - ahora.getTime());
   }
 
   getProducts(category: CategoryKey): Product[] {
@@ -233,5 +257,6 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.observers.forEach(o => o.disconnect());
+    if (this.midnightTimer) clearTimeout(this.midnightTimer);
   }
 }
