@@ -2,7 +2,8 @@ import { Component, inject } from '@angular/core';
 import { A11yModule } from '@angular/cdk/a11y';
 import { DialogRef, DIALOG_DATA } from '@angular/cdk/dialog';
 import { LucideX } from '@lucide/angular';
-import { Combo } from '../../../core/models/combo.model';
+import { Combo, ComboDetalle } from '../../../core/models/combo.model';
+import { formatearLineaCombo, LineaCombo } from '../../../core/utils/combo-format';
 
 export interface ComboDetailModalData {
   combo: Combo;
@@ -45,22 +46,35 @@ export interface ComboDetailModalData {
           📋 Este combo incluye
         </p>
         @for (detalle of data.combo.detalles; track $index) {
+          @let linea = formatear(detalle);
           <div
             class="flex items-center gap-3 px-3 py-2.5 rounded-xl"
             style="background: #242424; border: 1px solid #2A2A2A;"
           >
             <span style="color: #F07800; font-size: 18px;">•</span>
-            <div class="flex-1">
+            <div class="flex-1 min-w-0">
               <p class="font-heading font-semibold text-sm text-brand-white">
-  {{ detalle.cantidad > 1 ? detalle.cantidad + 'x ' : '' }}{{ detalle.productoNombre }}
-  @if (detalle.varianteSeleccionada && !detalle.ocultarVariante) {
-    <span style="color: #888; font-weight: 400;"> ({{ detalle.varianteSeleccionada.shortName }})</span>
-  }
-  @if (detalle.requiereSeleccion) {
-    <span style="color: #F07800; font-size: 11px; font-weight: 400;"> ✦ Elige tu sabor al agregar</span>
-  }
-</p>
-              
+                {{ linea.nombre }}
+              </p>
+              @if (linea.nota) {
+                <p class="font-body text-xs mt-0.5" style="color: #888;">
+                  {{ linea.nota }}
+                </p>
+              }
+            </div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              @if (linea.porcion) {
+                <span
+                  class="font-heading font-semibold text-xs px-2 py-0.5 rounded-full"
+                  style="color: rgba(240,120,0,0.9); border: 1px solid rgba(240,120,0,0.4); white-space: nowrap;"
+                >{{ linea.porcion }}</span>
+              }
+              @if (linea.cantidad) {
+                <span
+                  class="font-heading font-bold text-xs px-2 py-0.5 rounded-full"
+                  style="color: #F07800; background: rgba(240,120,0,0.12); border: 1px solid rgba(240,120,0,0.35); white-space: nowrap;"
+                >×{{ linea.cantidad }}</span>
+              }
             </div>
           </div>
         }
@@ -86,6 +100,10 @@ export class ComboDetailModalComponent {
 
   formatPrice(n: number): string {
     return `$${n.toLocaleString('es-CL')}`;
+  }
+
+  formatear(detalle: ComboDetalle): LineaCombo {
+    return formatearLineaCombo(detalle);
   }
 
   close(): void {

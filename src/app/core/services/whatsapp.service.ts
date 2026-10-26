@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CartItem } from '../models/cart-item.model';
+import { formatearLineaComboTexto } from '../utils/combo-format';
 import { environment } from '../../../environments/environment';
 
 export interface OrderData {
@@ -60,13 +61,7 @@ export class WhatsappService {
         let variantIndex = 0;
 
         for (const d of item.combo!.detalles) {
-          let linea = `   - ${d.productoNombre}`;
-
-          if (d.cantidad > 1) linea += ` x${d.cantidad}`;
-
-          if (!d.requiereSeleccion && d.varianteSeleccionada && !d.ocultarVariante) {
-            linea += ` (${d.varianteSeleccionada.shortName})`;
-          }
+          let seleccion: string | null = null;
 
           if (d.requiereSeleccion && d.cantidad > 0) {
             const variantesDeEsteDetalle = variants.slice(variantIndex, variantIndex + d.cantidad);
@@ -78,14 +73,13 @@ export class WhatsappService {
                 if (conteo.has(v.id)) conteo.get(v.id)!.count++;
                 else conteo.set(v.id, { variant: v, count: 1 });
               }
-              const resumen = Array.from(conteo.values())
-                .map(({ variant, count }) => count > 1 ? `${variant.name} x${count}` : variant.name)
+              seleccion = Array.from(conteo.values())
+                .map(({ variant, count }) => count > 1 ? `${variant.shortName} ×${count}` : variant.shortName)
                 .join(', ');
-              linea += `: ${resumen}`;
             }
           }
 
-          msg += linea + '\n';
+          msg += `   - ${formatearLineaComboTexto(d, seleccion)}\n`;
         }
       }
       msg += '\n';

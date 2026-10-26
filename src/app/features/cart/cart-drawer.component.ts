@@ -7,6 +7,7 @@ import { LucideX, LucideTrash2, LucidePlus, LucideMinus, LucideShoppingCart, Luc
 import { CartService } from '../../core/services/cart.service';
 import { WhatsappService } from '../../core/services/whatsapp.service';
 import { CartItem } from '../../core/models/cart-item.model';
+import { formatearLineaComboTexto } from '../../core/utils/combo-format';
 import { IngredientModalComponent, IngredientModalResult } from '../../shared/components/ingredient-modal/ingredient-modal.component';
 
 @Component({
@@ -265,15 +266,7 @@ export class CartDrawerComponent implements OnDestroy {
       let variantIndex = 0;
 
       const detalles = item.combo.detalles.map(d => {
-        let texto = d.productoNombre;
-
-        if (d.cantidad > 1) {
-          texto += ` (x${d.cantidad})`;
-        }
-
-        if (!d.requiereSeleccion && d.varianteSeleccionada && !d.ocultarVariante) {
-          texto += ` (${d.varianteSeleccionada.shortName})`;
-        }
+        let seleccion: string | null = null;
 
         if (d.requiereSeleccion && d.cantidad > 0) {
           const variantesDeEsteDetalle = variants.slice(variantIndex, variantIndex + d.cantidad);
@@ -288,16 +281,15 @@ export class CartDrawerComponent implements OnDestroy {
                 conteo.set(v.id, { variant: v, count: 1 });
               }
             }
-            const resumen = Array.from(conteo.values())
+            seleccion = Array.from(conteo.values())
               .map(({ variant, count }) =>
-                count > 1 && count < d.cantidad ? `${variant.shortName} (x${count})` : variant.shortName
+                count > 1 ? `${variant.shortName} ×${count}` : variant.shortName
               )
               .join(', ');
-            texto += ` (${resumen})`;
           }
         }
 
-        return texto;
+        return formatearLineaComboTexto(d, seleccion);
       });
 
       return { variant: null, removed: detalles, extras: [] };
