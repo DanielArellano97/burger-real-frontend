@@ -211,7 +211,8 @@ export class ProductCardComponent {
     const original = this.cartService.cartItems().find(item =>
       item.product.id === this.product().id &&
       item.customizedIngredients.every(i => i.currentQuantity === i.defaultQuantity) &&
-      !item.selectedVariant
+      !item.selectedVariant &&
+      !item.isPromo
     );
     return original?.quantity ?? 0;
   });
@@ -220,7 +221,8 @@ export class ProductCardComponent {
     const original = this.cartService.cartItems().find(item =>
       item.product.id === this.product().id &&
       item.customizedIngredients.every(i => i.currentQuantity === i.defaultQuantity) &&
-      !item.selectedVariant
+      !item.selectedVariant &&
+      !item.isPromo
     );
     return original?.cartItemId ?? null;
   });

@@ -12,4 +12,10 @@ export interface CartItem {
   isCombo?: boolean;
   combo?: Combo;
   selectedDrink?: Product;
+  /**
+   * `true` = línea creada desde "Burger de la semana".
+   * Se mantiene separada de la burger de carta aunque sea el mismo producto,
+   * porque tiene otro precio y no admite personalización.
+   */
+  isPromo?: boolean;
 }

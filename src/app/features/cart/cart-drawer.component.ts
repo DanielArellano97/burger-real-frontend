@@ -78,6 +78,8 @@ import { IngredientModalComponent, IngredientModalResult } from '../../shared/co
                   <p class="font-heading font-semibold text-sm text-brand-white leading-tight">
                     @if (item.isCombo) {
                       <span style="color: #F07800;">Combo </span>
+                    } @else if (item.isPromo) {
+                      <span style="color: #F07800;">Promo · </span>
                     }{{ item.product.name }}
                   </p>
 
@@ -141,7 +143,7 @@ import { IngredientModalComponent, IngredientModalResult } from '../../shared/co
                     {{ formatPrice(item.unitPrice * item.quantity) }}
                   </span>
                   <div class="flex items-center gap-1">
-                    @if (item.product.customizable) {
+                    @if (item.product.customizable && !item.isPromo) {
                       <button
                         (click)="openEditModal(item)"
                         class="flex items-center justify-center w-7 h-7 rounded-lg transition-colors hover:bg-brand-surface-2"

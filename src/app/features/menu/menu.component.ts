@@ -1,6 +1,6 @@
 import {
   Component, inject, signal, computed, effect, DestroyRef,
-  AfterViewInit, OnDestroy, OnInit, ChangeDetectionStrategy,
+  AfterViewInit, OnDestroy, OnInit, ChangeDetectionStrategy, isDevMode,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { fromEvent } from 'rxjs';
@@ -18,6 +18,22 @@ import { ComboDetailModalComponent, ComboDetailModalData } from '../../shared/co
 import { NotificationService } from '../../core/services/notification.service';
 import { ProductoService } from '../../core/services/producto.service';
 import { ComboService } from '../../core/services/combo.service';
+
+/**
+ * Fecha fija para probar la rotación en desarrollo: `?fecha=2026-10-26`.
+ * En producción siempre devuelve `null`, así que se usa la fecha real.
+ */
+function leerFechaSimulada(): Date | null {
+  if (!isDevMode()) return null;
+
+  const valor = new URLSearchParams(location.search).get('fecha');
+  if (!valor) return null;
+
+  const [anio, mes, dia] = valor.split('-').map(Number);
+  const fecha = new Date(anio, mes - 1, dia);
+
+  return Number.isNaN(fecha.getTime()) ? null : fecha;
+}
 
 type CategoryKey = (typeof CATEGORIES)[number]['key'];
 
@@ -44,8 +60,11 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
   loading = this.productoService.loading;
   error   = this.productoService.error;
 
+  /** Fecha fija para probar la rotación en desarrollo (`?fecha=2026-10-26`). */
+  private readonly fechaSimulada = leerFechaSimulada();
+
   /** Fecha actual; se actualiza al cruzar la medianoche o al volver a la pestaña. */
-  private hoy = signal(new Date());
+  private hoy = signal(this.fechaSimulada ?? new Date());
   private midnightTimer?: ReturnType<typeof setTimeout>;
 
   burgerOfTheWeek = computed<BurgerEnOferta | null>(() =>
@@ -70,12 +89,14 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
     fromEvent(document, 'visibilitychange')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        if (!document.hidden) this.hoy.set(new Date());
+        if (!document.hidden) this.hoy.set(this.fechaSimulada ?? new Date());
       });
   }
 
   /** Reevalúa la fecha al cruzar la medianoche. */
   private programarCambioDeDia(): void {
+    if (this.fechaSimulada) return;
+
     const ahora = new Date();
     const proximoDia = new Date(
       ahora.getFullYear(), ahora.getMonth(), ahora.getDate() + 1, 0, 0, 1
@@ -87,8 +108,16 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
     }, proximoDia.getTime() - ahora.getTime());
   }
 
+  /**
+   * Productos de la categoría. Mientras la promo está activa, la burger de la
+   * semana no se repite en la lista: ya está destacada arriba.
+   */
   getProducts(category: CategoryKey): Product[] {
-    return this.productoService.products().filter(p => p.category === category);
+    const promo = this.ofertaActiva() ? this.burgerOfTheWeek() : null;
+
+    return this.productoService
+      .products()
+      .filter(p => p.category === category && p.id !== promo?.id);
   }
 
   formatPrice(n: number): string {
@@ -191,7 +220,9 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cartService.addItem(
           bw,
           bw.ingredients.map(i => ({ ...i })),
-          precio
+          precio,
+          undefined,
+          true
         );
         this.notification.show(bw.name);
       }

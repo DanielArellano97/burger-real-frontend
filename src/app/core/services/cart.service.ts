@@ -46,13 +46,20 @@ export class CartService {
     }
   }
 
-  addItem(product: Product, ingredients: Ingredient[], unitPrice: number, selectedVariant?: SizeVariant): void {
+  addItem(
+    product: Product,
+    ingredients: Ingredient[],
+    unitPrice: number,
+    selectedVariant?: SizeVariant,
+    isPromo = false
+  ): void {
     const key = buildIngredientKey(ingredients);
     const variantKey = selectedVariant?.id ?? null;
 
     this.cartItems.update(items => {
       const existing = items.find(i =>
         i.product.id === product.id &&
+        !!i.isPromo === isPromo &&
         (i.selectedVariant?.id ?? null) === variantKey &&
         buildIngredientKey(i.customizedIngredients) === key
       );
@@ -70,6 +77,7 @@ export class CartService {
         customizedIngredients: ingredients,
         unitPrice,
         selectedVariant,
+        isPromo: isPromo || undefined,
       }];
     });
   }
@@ -117,8 +125,11 @@ export class CartService {
     );
   }
 
-  getCartItemByProductId(productId: number): CartItem | undefined {
-    return this.cartItems().find(i => i.product.id === productId);
+  /** Línea de carta del producto (excluye la promo "Burger de la semana"). */
+  getCartItemByProductId(productId: number, isPromo = false): CartItem | undefined {
+    return this.cartItems().find(i =>
+      i.product.id === productId && !!i.isPromo === isPromo
+    );
   }
 
   addCombo(combo: Combo, selectedVariants: SizeVariant[]): void {
