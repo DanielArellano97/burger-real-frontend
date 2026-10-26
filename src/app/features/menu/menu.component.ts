@@ -167,7 +167,8 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
     combo: Combo,
     selecciones: { detalle: ComboDetalle; turno: number; total: number }[],
     index: number,
-    variantesElegidas: SizeVariant[]
+    variantesElegidas: SizeVariant[],
+    seleccionInicial?: SizeVariant
   ): void {
     if (index >= selecciones.length) {
       this.cartService.addCombo(combo, variantesElegidas);
@@ -180,7 +181,16 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
     const ref = this.dialog.open<ComboModalResult, ComboModalData>(
       ComboModalComponent,
       {
-        data: { combo, detalle, opciones: detalle.opcionesDisponibles, turno, total },
+        data: {
+          combo,
+          detalle,
+          opciones: detalle.opcionesDisponibles,
+          turno,
+          total,
+          seleccionInicial,
+          seleccionesPrevias: variantesElegidas,
+          puedeVolver: index > 0,
+        },
         backdropClass: 'burger-dialog-backdrop',
         panelClass: 'burger-modal-pane',
         width: '380px',
@@ -190,9 +200,26 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
     );
 
     ref.closed.subscribe(result => {
-      if (result) {
-        this.abrirModalSecuencial(combo, selecciones, index + 1, [...variantesElegidas, result.selectedVariant]);
+      if (!result) return;
+
+      if ('back' in result) {
+        const anterior = variantesElegidas[variantesElegidas.length - 1];
+        this.abrirModalSecuencial(
+          combo,
+          selecciones,
+          index - 1,
+          variantesElegidas.slice(0, -1),
+          anterior
+        );
+        return;
       }
+
+      this.abrirModalSecuencial(
+        combo,
+        selecciones,
+        index + 1,
+        [...variantesElegidas, result.selectedVariant]
+      );
     });
   }
 
