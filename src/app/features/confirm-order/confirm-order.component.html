@@ -159,11 +159,26 @@
             } @else if (gpsStatus() === 'success') {
               <span style="color: #4ade80;">📍 Ubicación capturada correctamente</span>
             } @else if (gpsStatus() === 'error') {
-              <span style="color: #f87171;">⚠️ No se pudo obtener la ubicación</span>
+              <span style="color: #f87171;">📍 Reintentar captura de ubicación</span>
             } @else {
               <span>📍 Fijar ubicación exacta con GPS</span>
             }
           </button>
+
+          <!-- Detalle del error de GPS -->
+          @if (gpsStatus() === 'error') {
+            <div class="rounded-lg p-3 space-y-1.5" style="background: #2A1B1B; border: 1px solid #5A2A2A;">
+              <p class="font-heading font-semibold text-sm" style="color: #f87171;">
+                No se pudo obtener la ubicación
+              </p>
+              <p class="font-body text-xs leading-relaxed" style="color: #F0DCC8;">
+                {{ gpsError() }}
+              </p>
+              <p class="font-body text-xs leading-relaxed" style="color: #888;">
+                Si no logras activarla, escribe tu dirección: el pedido se envía con el delivery por confirmar.
+              </p>
+            </div>
+          }
 
           <!-- Resultado del GPS -->
           @if (deliveryInfo(); as info) {

@@ -27,6 +27,8 @@ export class ConfirmOrderComponent implements OnInit {
   gpsCoords      = signal<{ lat: number; lng: number } | null>(null);
   gpsAccuracy    = signal<number | null>(null);
   gpsStatus      = signal<'idle' | 'loading' | 'success' | 'error'>('idle');
+  gpsError       = signal<string | null>(null);
+  gpsErrorCode   = signal<number | null>(null);
 
   paymentMethod = signal<'transfer' | 'cash'>('transfer');
   copied        = signal(false);
@@ -175,30 +177,88 @@ export class ConfirmOrderComponent implements OnInit {
   }
 
   requestGPS(): void {
-    if (!navigator.geolocation) {
+    this.gpsError.set(null);
+    this.gpsErrorCode.set(null);
+
+    if (!window.isSecureContext) {
       this.gpsStatus.set('error');
+      this.gpsError.set(
+        'La ubicación solo funciona en sitios HTTPS. Abre la página con https:// y vuelve a intentar.'
+      );
       return;
     }
+
+    if (!navigator.geolocation) {
+      this.gpsStatus.set('error');
+      this.gpsError.set(
+        'Tu navegador no soporta geolocalización. Escribe tu dirección para continuar.'
+      );
+      return;
+    }
+
     this.gpsStatus.set('loading');
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        this.gpsCoords.set({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-        this.gpsAccuracy.set(position.coords.accuracy ?? null);
-        this.gpsStatus.set('success');
-        this.saveFormToSession();
-      },
-      () => {
-        this.gpsStatus.set('error');
-      },
+      position => this.aplicarPosicion(position),
+      error => this.handleGpsError(error, true),
       {
         enableHighAccuracy: true,
-        timeout: 10000,
+        timeout: 15000,
         maximumAge: 0,
       }
     );
+  }
+
+  private aplicarPosicion(position: GeolocationPosition): void {
+    this.gpsCoords.set({
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+    });
+    this.gpsAccuracy.set(position.coords.accuracy ?? null);
+    this.gpsStatus.set('success');
+    this.gpsError.set(null);
+    this.gpsErrorCode.set(null);
+    this.saveFormToSession();
+  }
+
+  /**
+   * Si la captura de alta precisión falla por timeout o GPS no disponible,
+   * reintenta una vez en modo normal. En interiores el GPS estricto suele no
+   * responder y la ubicación por red/wifi basta para calcular el tramo.
+   */
+  private handleGpsError(error: GeolocationPositionError, altaPrecision: boolean): void {
+    console.warn(
+      `[GPS] code=${error.code} message="${error.message}" secure=${window.isSecureContext}`
+    );
+
+    if (altaPrecision && (error.code === 2 || error.code === 3)) {
+      navigator.geolocation.getCurrentPosition(
+        position => this.aplicarPosicion(position),
+        segundoError => this.handleGpsError(segundoError, false),
+        {
+          enableHighAccuracy: false,
+          timeout: 10000,
+          maximumAge: 60000,
+        }
+      );
+      return;
+    }
+
+    this.gpsStatus.set('error');
+    this.gpsErrorCode.set(error.code);
+    this.gpsError.set(this.mensajeGps(error.code));
+  }
+
+  private mensajeGps(code: number): string {
+    if (code === 1) {
+      return 'El navegador bloqueó el permiso de ubicación. Actívalo desde el candado de la barra de direcciones (o en Ajustes del teléfono) y vuelve a intentar.';
+    }
+    if (code === 2) {
+      return 'No pudimos obtener tu ubicación. Revisa que el GPS esté activo y que el navegador tenga permiso de ubicación.';
+    }
+    if (code === 3) {
+      return 'La ubicación tardó demasiado. Intenta de nuevo cerca de una ventana o escribe tu dirección.';
+    }
+    return 'No se pudo obtener la ubicación. Escribe tu dirección para continuar.';
   }
 
   copyAccountNumber(): void {
