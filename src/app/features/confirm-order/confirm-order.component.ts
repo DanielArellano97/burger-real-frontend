@@ -250,7 +250,7 @@ export class ConfirmOrderComponent implements OnInit {
 
   private mensajeGps(code: number): string {
     if (code === 1) {
-      return 'El navegador bloqueó el permiso de ubicación. Actívalo desde el candado de la barra de direcciones (o en Ajustes del teléfono) y vuelve a intentar.';
+      return 'El navegador bloqueó el permiso de ubicación. En iPhone: toca «aA» en la barra de direcciones → Ajustes del sitio web → Ubicación → Permitir, y recarga la página. Revisa también Ajustes → Privacidad y seguridad → Localización → Safari.';
     }
     if (code === 2) {
       return 'No pudimos obtener tu ubicación. Revisa que el GPS esté activo y que el navegador tenga permiso de ubicación.';
