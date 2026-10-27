@@ -1,0 +1,8 @@
+# Configuración de pnpm (v11 ya no lee el campo "pnpm" de package.json).
+# Estos paquetes necesitan ejecutar scripts de instalación; sin esta lista
+# pnpm 11 falla el install con ERR_PNPM_IGNORED_BUILDS.
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - esbuild
+  - lmdb
+  - msgpackr-extract
