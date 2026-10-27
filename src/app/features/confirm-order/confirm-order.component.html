@@ -35,9 +35,39 @@
         </div>
       }
     </div>
-    <div class="px-4 py-3 border-t flex justify-between items-center" style="border-color: #2A2A2A;">
-      <span class="font-heading text-sm text-brand-cream">Total</span>
-      <span class="font-display text-2xl text-brand-orange">{{ formatPrice(cartService.totalPrice()) }}</span>
+    <div class="px-4 py-3 border-t space-y-1.5" style="border-color: #2A2A2A;">
+      @if (deliveryMethod() === 'delivery') {
+        <div class="flex justify-between items-center">
+          <span class="font-body text-sm" style="color: #888;">Subtotal</span>
+          <span class="font-body text-sm text-brand-cream">{{ formatPrice(subtotal()) }}</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="font-body text-sm" style="color: #888;">Delivery</span>
+          @if (deliveryPendiente()) {
+            <span class="font-heading text-sm" style="color: #F0B45A;">Por confirmar</span>
+          } @else if (deliveryFueraDeCobertura()) {
+            <span class="font-heading text-sm" style="color: #f87171;">Fuera de cobertura</span>
+          } @else {
+            <span class="font-body text-sm text-brand-cream">{{ formatPrice(deliveryFee() ?? 0) }}</span>
+          }
+        </div>
+      }
+      <div class="flex justify-between items-center pt-1">
+        <span class="font-heading text-sm text-brand-cream">
+          {{ totalEsProvisional() ? 'Total productos' : 'Total' }}
+        </span>
+        <span class="font-display text-2xl text-brand-orange">{{ formatPrice(total()) }}</span>
+      </div>
+      @if (deliveryMethod() === 'delivery' && deliveryPendiente()) {
+        <p class="font-body text-xs" style="color: #F0B45A;">
+          No incluye delivery. El valor se confirma por WhatsApp.
+        </p>
+      }
+      @if (deliveryMethod() === 'delivery' && deliveryFueraDeCobertura()) {
+        <p class="font-body text-xs" style="color: #f87171;">
+          Fuera del radio de reparto. Elige retiro en local para continuar.
+        </p>
+      }
     </div>
   </section>
 
@@ -104,7 +134,7 @@
           <span>Retiro en Local</span>
         </button>
         <button
-          (click)="deliveryMethod.set('delivery'); gpsCoords.set(null); gpsStatus.set('idle'); saveFormToSession()"
+          (click)="deliveryMethod.set('delivery'); saveFormToSession()"
           class="flex flex-col items-center justify-center gap-1 py-3 rounded-lg transition-colors font-heading text-sm font-semibold"
           [style.background]="deliveryMethod() === 'delivery' ? '#F07800' : '#242424'"
           [style.color]="deliveryMethod() === 'delivery' ? '#0F0F0F' : '#F0F0F0'"
@@ -135,10 +165,75 @@
             }
           </button>
 
-          <!-- Campo de dirección — siempre visible cuando delivery está seleccionado -->
+          <!-- Resultado del GPS -->
+          @if (deliveryInfo(); as info) {
+            <div class="rounded-lg p-3 space-y-2" style="background: #242424; border: 1px solid #2A2A2A;">
+              <div class="flex items-center justify-between gap-2">
+                <p class="font-heading font-semibold text-sm" style="color: #4ade80;">
+                  📍 Ubicación capturada
+                </p>
+                @if (gpsAccuracyTexto(); as precision) {
+                  <span class="font-body text-xs" style="color: #888;">±{{ precision }} m</span>
+                }
+              </div>
+
+              @if (gpsPrecisionBaja()) {
+                <p class="font-body text-xs" style="color: #F0B45A;">
+                  La señal es poco precisa. Puedes reintentar o agregar referencias.
+                </p>
+              }
+
+              @if (info.fueraDeCobertura) {
+                <p class="font-body text-sm" style="color: #f87171;">
+                  Estás a {{ info.km.toFixed(1) }} km, fuera del radio de reparto.
+                </p>
+                <button
+                  (click)="deliveryMethod.set('pickup'); saveFormToSession()"
+                  class="w-full py-2 rounded-lg font-heading font-semibold text-xs transition-all"
+                  style="background: #F07800; color: #0F0F0F;"
+                >
+                  Cambiar a retiro en local
+                </button>
+              } @else {
+                <p class="font-body text-sm" style="color: #F0DCC8;">
+                  {{ info.km.toFixed(1) }} km aprox. del local
+                  <span style="color: #F07800;"> · Delivery {{ formatPrice(info.precio ?? 0) }}</span>
+                </p>
+              }
+
+              <div class="flex items-center gap-2 pt-1">
+                @if (mapaUrl(); as url) {
+                  <a
+                    [href]="url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg font-heading font-semibold text-xs transition-all"
+                    style="background: #2A2A2A; color: #F07800;"
+                  >
+                    Ver mapa
+                  </a>
+                }
+                <button
+                  (click)="requestGPS()"
+                  class="flex-1 py-2 rounded-lg font-heading font-semibold text-xs transition-all border"
+                  style="background: transparent; color: #888; border-color: #2A2A2A;"
+                >
+                  Volver a capturar
+                </button>
+              </div>
+            </div>
+          }
+
+          @if (deliveryPendiente()) {
+            <p class="font-body text-xs leading-relaxed" style="color: #F0B45A;">
+              Sin ubicación GPS, el valor del delivery queda por confirmar por WhatsApp.
+            </p>
+          }
+
+          <!-- Campo de dirección -->
           <div>
             <label class="font-body text-xs mb-1 block" style="color: #888;">
-              Dirección de entrega *
+              {{ isDeliveryAddressRequired() ? 'Dirección de entrega *' : 'Dirección o referencias (opcional)' }}
             </label>
             <input
               type="text"
@@ -151,12 +246,6 @@
               (blur)="$event.target.style.borderColor='#2A2A2A'"
             />
           </div>
-
-          @if (gpsStatus() === 'success') {
-            <p class="font-body text-xs" style="color: #4ade80;">
-              📍 Ubicación GPS capturada. Podés agregar referencias en el campo de arriba.
-            </p>
-          }
         </div>
       }
     </div>
@@ -237,7 +326,7 @@
               type="number"
               [value]="cashAmount()"
               (input)="cashAmount.set($any($event.target).value)"
-              [placeholder]="'Monto mínimo: ' + formatPrice(cartService.totalPrice())"
+              [placeholder]="'Monto mínimo: ' + formatPrice(total())"
               class="w-full px-3 py-2.5 rounded-lg font-body text-sm text-brand-white outline-none"
               style="background: #242424; border: 1px solid #2A2A2A;"
               (focus)="$event.target.style.borderColor='#F07800'"
@@ -246,7 +335,12 @@
             />
             @if (cashAmount().length > 0 && !isCashAmountValid()) {
               <p class="font-body text-xs mt-1" style="color: #f87171;">
-                El monto debe ser igual o mayor al total del pedido ({{ formatPrice(cartService.totalPrice()) }})
+                El monto debe ser igual o mayor al total del pedido ({{ formatPrice(total()) }})
+              </p>
+            }
+            @if (deliveryPendiente()) {
+              <p class="font-body text-xs mt-1" style="color: #F0B45A;">
+                El vuelto no incluye delivery; se ajusta cuando se confirme el valor.
               </p>
             }
           </div>

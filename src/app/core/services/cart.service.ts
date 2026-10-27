@@ -2,6 +2,9 @@ import { Injectable, signal, computed, effect } from '@angular/core';
 import { Product, Ingredient, SizeVariant } from '../models/product.model';
 import { CartItem } from '../models/cart-item.model';
 import { Combo } from '../models/combo.model';
+import { claveDelDia } from '../utils/burger-of-the-week';
+
+const STORAGE_KEY = 'burger-real-cart';
 
 function buildIngredientKey(ingredients: Ingredient[]): string {
   return JSON.stringify(ingredients.map(i => ({ id: i.id, qty: i.currentQuantity })));
@@ -27,7 +30,7 @@ export class CartService {
   constructor() {
     effect(() => {
       try {
-        localStorage.setItem('burger-real-cart', JSON.stringify(this.cartItems()));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.cartItems()));
       } catch {
         // localStorage unavailable
       }
@@ -36,11 +39,16 @@ export class CartService {
 
   private loadFromStorage(): CartItem[] {
     try {
-      const data = JSON.parse(localStorage.getItem('burger-real-cart') || '[]');
+      const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
       if (!Array.isArray(data) || data.some((item: CartItem) => !item.cartItemId)) {
         return [];
       }
-      return data;
+
+      // La promo rota a diario: si el carrito se reabre otro día, la línea
+      // anterior deja de ser válida y se descarta.
+      const hoy = claveDelDia(new Date());
+
+      return data.filter(item => !item.isPromo || item.promoDate === hoy);
     } catch {
       return [];
     }
@@ -51,7 +59,8 @@ export class CartService {
     ingredients: Ingredient[],
     unitPrice: number,
     selectedVariant?: SizeVariant,
-    isPromo = false
+    isPromo = false,
+    promoDate?: string
   ): void {
     const key = buildIngredientKey(ingredients);
     const variantKey = selectedVariant?.id ?? null;
@@ -78,6 +87,7 @@ export class CartService {
         unitPrice,
         selectedVariant,
         isPromo: isPromo || undefined,
+        promoDate: isPromo ? (promoDate ?? claveDelDia(new Date())) : undefined,
       }];
     });
   }

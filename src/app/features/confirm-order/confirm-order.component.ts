@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { LucideChevronLeft, LucideCheck, LucideCopy } from '@lucide/angular';
 import { CartService } from '../../core/services/cart.service';
 import { WhatsappService, OrderData } from '../../core/services/whatsapp.service';
+import { calcularDelivery, urlRutaMapa } from '../../core/utils/delivery';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -24,6 +25,7 @@ export class ConfirmOrderComponent implements OnInit {
 
   deliveryMethod = signal<'pickup' | 'delivery'>('pickup');
   gpsCoords      = signal<{ lat: number; lng: number } | null>(null);
+  gpsAccuracy    = signal<number | null>(null);
   gpsStatus      = signal<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   paymentMethod = signal<'transfer' | 'cash'>('transfer');
@@ -48,19 +50,76 @@ export class ConfirmOrderComponent implements OnInit {
     return isNaN(n) ? 0 : n;
   });
 
+  /** Subtotal de productos, sin delivery. */
+  subtotal = computed(() => this.cartService.totalPrice());
+
+  /** Cálculo de delivery; `null` si es retiro o aún no hay GPS. */
+  deliveryInfo = computed(() => {
+    if (this.deliveryMethod() !== 'delivery') return null;
+    const coords = this.gpsCoords();
+    return coords ? calcularDelivery(coords) : null;
+  });
+
+  /** Delivery elegido pero sin ubicación capturada: valor por confirmar. */
+  deliveryPendiente = computed(() =>
+    this.deliveryMethod() === 'delivery' && !this.gpsCoords()
+  );
+
+  deliveryFueraDeCobertura = computed(() =>
+    this.deliveryInfo()?.fueraDeCobertura ?? false
+  );
+
+  /** Precio del delivery. `0` en retiro, `null` si falta confirmar. */
+  deliveryFee = computed<number | null>(() => {
+    if (this.deliveryMethod() !== 'delivery') return 0;
+    const info = this.deliveryInfo();
+    return info && !info.fueraDeCobertura ? info.precio : null;
+  });
+
+  /** Total a pagar. Con delivery pendiente equivale al subtotal. */
+  total = computed(() => this.subtotal() + (this.deliveryFee() ?? 0));
+
+  /** El resumen no puede llamarse "Total" si el delivery aún no está incluido. */
+  totalEsProvisional = computed(() =>
+    this.deliveryMethod() === 'delivery' &&
+    (this.deliveryPendiente() || this.deliveryFueraDeCobertura())
+  );
+
+  mapaUrl = computed(() => {
+    const coords = this.gpsCoords();
+    return coords ? urlRutaMapa(coords) : null;
+  });
+
+  gpsPrecisionBaja = computed(() => {
+    const precision = this.gpsAccuracy();
+    return precision !== null && precision > 100;
+  });
+
+  gpsAccuracyTexto = computed(() => {
+    const precision = this.gpsAccuracy();
+    return precision === null ? null : Math.round(precision).toString();
+  });
+
+  isDeliveryAddressRequired = computed(() =>
+    this.deliveryMethod() === 'delivery' && !this.gpsCoords()
+  );
+
   change = computed(() =>
-    this.cashAmountNumber() >= this.cartService.totalPrice()
-      ? this.cashAmountNumber() - this.cartService.totalPrice()
+    this.cashAmountNumber() >= this.total()
+      ? this.cashAmountNumber() - this.total()
       : null
   );
 
   isCashAmountValid = computed(() =>
-    this.cashAmountNumber() >= this.cartService.totalPrice()
+    this.cashAmountNumber() >= this.total()
   );
 
   isFormValid = computed(() => {
     const base = this.isNameValid() && this.isPhoneValid();
-    const deliveryOk = this.deliveryMethod() === 'pickup' || this.address().trim().length > 0;
+    const deliveryOk =
+      this.deliveryMethod() === 'pickup' ||
+      (!this.deliveryFueraDeCobertura() &&
+        (!!this.gpsCoords() || this.address().trim().length > 0));
     const cashOk = this.paymentMethod() === 'transfer' || this.isCashAmountValid();
     return base && deliveryOk && cashOk;
   });
@@ -78,6 +137,11 @@ export class ConfirmOrderComponent implements OnInit {
         if (data.paymentMethod)  this.paymentMethod.set(data.paymentMethod);
         if (data.notes)          this.notes.set(data.notes);
         if (data.address)        this.address.set(data.address);
+        if (data.gpsCoords) {
+          this.gpsCoords.set(data.gpsCoords);
+          this.gpsAccuracy.set(data.gpsAccuracy ?? null);
+          this.gpsStatus.set('success');
+        }
       } catch {
         sessionStorage.removeItem(this.STORAGE_KEY);
       }
@@ -104,6 +168,8 @@ export class ConfirmOrderComponent implements OnInit {
       paymentMethod:  this.paymentMethod(),
       notes:          this.notes(),
       address:        this.address(),
+      gpsCoords:      this.gpsCoords(),
+      gpsAccuracy:    this.gpsAccuracy(),
     };
     sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
   }
@@ -120,7 +186,9 @@ export class ConfirmOrderComponent implements OnInit {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         });
+        this.gpsAccuracy.set(position.coords.accuracy ?? null);
         this.gpsStatus.set('success');
+        this.saveFormToSession();
       },
       () => {
         this.gpsStatus.set('error');
@@ -169,6 +237,8 @@ export class ConfirmOrderComponent implements OnInit {
   confirmOrder(): void {
     if (!this.isFormValid()) return;
 
+    const deliveryInfo = this.deliveryInfo();
+
     const orderData: OrderData = {
       name:           this.name().trim(),
       phone:          this.phone().trim(),
@@ -179,6 +249,10 @@ export class ConfirmOrderComponent implements OnInit {
       address:        this.address().trim(),
       cashAmount:     this.cashAmountNumber(),
       change:         this.change() ?? 0,
+      subtotal:       this.subtotal(),
+      deliveryFee:    this.deliveryFee(),
+      deliveryPending: this.deliveryPendiente(),
+      distanceKm:     deliveryInfo?.km ?? null,
     };
 
     this.whatsappService.sendOrder(this.cartService.cartItems(), orderData);

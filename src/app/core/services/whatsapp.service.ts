@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CartItem } from '../models/cart-item.model';
 import { formatearLineaComboTexto } from '../utils/combo-format';
+import { urlRutaMapa } from '../utils/delivery';
 import { environment } from '../../../environments/environment';
 
 export interface OrderData {
@@ -13,6 +14,14 @@ export interface OrderData {
   address: string;
   cashAmount: number;
   change: number;
+  /** Subtotal de productos, sin delivery. */
+  subtotal: number;
+  /** Precio del delivery; `null` cuando queda por confirmar. */
+  deliveryFee: number | null;
+  /** `true` si el cliente no capturó GPS y el valor se confirma por WhatsApp. */
+  deliveryPending: boolean;
+  /** Distancia estimada local → cliente; `null` en retiro o sin GPS. */
+  distanceKm: number | null;
 }
 
 const CATEGORY_META: Record<string, { emoji: string; label: string }> = {
@@ -124,9 +133,32 @@ export class WhatsappService {
       msg += '\n';
     }
 
-    const total = items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
+    const subtotal = items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
+    const deliveryPendiente = order?.deliveryMethod === 'delivery' && order.deliveryPending;
+    const deliveryFee = order?.deliveryMethod === 'delivery' && !deliveryPendiente
+      ? order.deliveryFee ?? 0
+      : null;
+    const total = subtotal + (deliveryFee ?? 0);
+
     msg += `━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    msg += `💰 *TOTAL: ${this.formatPrice(total)}*\n`;
+
+    if (order?.deliveryMethod === 'delivery') {
+      msg += `💰 *RESUMEN*\n`;
+      msg += `• Subtotal: ${this.formatPrice(subtotal)}\n`;
+      msg += deliveryPendiente
+        ? `• Delivery: por confirmar\n`
+        : `• Delivery: ${this.formatPrice(deliveryFee ?? 0)}\n`;
+
+      if (deliveryPendiente) {
+        msg += `• *TOTAL PRODUCTOS: ${this.formatPrice(subtotal)}*\n`;
+        msg += `⚠️ No incluye delivery — se confirma por WhatsApp.\n`;
+      } else {
+        msg += `• *TOTAL: ${this.formatPrice(total)}*\n`;
+      }
+    } else {
+      msg += `💰 *TOTAL: ${this.formatPrice(total)}*\n`;
+    }
+
     msg += `━━━━━━━━━━━━━━━━━━━━━━━\n`;
 
     if (order) {
@@ -136,8 +168,14 @@ export class WhatsappService {
         msg += `• Modalidad: Delivery a Domicilio\n`;
         if (order.address) msg += `• Dirección: ${order.address}\n`;
         if (order.gpsCoords) {
-          msg += `• Ubicación GPS: https://www.google.com/maps?q=${order.gpsCoords.lat},${order.gpsCoords.lng}\n`;
+          msg += `• Ubicación GPS: ${urlRutaMapa(order.gpsCoords)}\n`;
         }
+        if (order.distanceKm !== null) {
+          msg += `• Distancia aprox.: ${order.distanceKm.toFixed(1)} km\n`;
+        }
+        msg += order.deliveryPending
+          ? `• Delivery: por confirmar\n`
+          : `• Delivery: ${this.formatPrice(order.deliveryFee ?? 0)}\n`;
       } else {
         msg += `• Modalidad: Retiro en Local\n`;
       }
@@ -149,7 +187,9 @@ export class WhatsappService {
       } else {
         msg += `• Método: Efectivo\n`;
         msg += `• Paga con: ${this.formatPrice(order.cashAmount)}\n`;
-        if (order.change > 0) {
+        if (order.deliveryPending) {
+          msg += `• Vuelto: se confirma junto con el delivery\n`;
+        } else if (order.change > 0) {
           msg += `• Vuelto requerido: ${this.formatPrice(order.change)}\n`;
         } else {
           msg += `• Pago justo — sin vuelto\n`;

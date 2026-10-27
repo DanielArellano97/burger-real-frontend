@@ -10,7 +10,7 @@ import { CATEGORIES } from '../../core/data/menu.data';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 import { CartService } from '../../core/services/cart.service';
 import { Combo, ComboDetalle } from '../../core/models/combo.model';
-import { BurgerEnOferta, burgerDelDia, esDiaDeOferta } from '../../core/utils/burger-of-the-week';
+import { BurgerEnOferta, burgerDelDia, claveDelDia, esDiaDeOferta } from '../../core/utils/burger-of-the-week';
 import { Product, SizeVariant } from '../../core/models/product.model';
 import { ComboModalComponent, ComboModalData, ComboModalResult } from '../../shared/components/combo-modal/combo-modal.component';
 import { BurgerOfTheWeekModalComponent, BurgerOfTheWeekModalData, BurgerOfTheWeekModalResult } from '../../shared/components/burger-of-the-week-modal/burger-of-the-week-modal.component';
@@ -249,7 +249,8 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
           bw.ingredients.map(i => ({ ...i })),
           precio,
           undefined,
-          true
+          true,
+          claveDelDia(this.hoy())
         );
         this.notification.show(bw.name);
       }

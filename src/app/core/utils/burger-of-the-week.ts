@@ -8,6 +8,13 @@ const LUNES_ANCLA = Date.UTC(2026, 0, 5);
 
 const MS_DIA = 86_400_000;
 
+/** Clave local `YYYY-MM-DD`, usada para saber a qué día pertenece una promo. */
+export function claveDelDia(fecha: Date): string {
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  return `${fecha.getFullYear()}-${mes}-${dia}`;
+}
+
 /** ¿Corresponde mostrar el precio de oferta? Solo lunes a jueves. */
 export function esDiaDeOferta(fecha: Date): boolean {
   const dia = fecha.getDay(); // 0 = domingo … 6 = sábado

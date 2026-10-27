@@ -18,4 +18,9 @@ export interface CartItem {
    * porque tiene otro precio y no admite personalización.
    */
   isPromo?: boolean;
+  /**
+   * Día en que se agregó la promo (`YYYY-MM-DD`). Sirve para descartarla al
+   * reabrir el navegador otro día, cuando la oferta ya rotó.
+   */
+  promoDate?: string;
 }
