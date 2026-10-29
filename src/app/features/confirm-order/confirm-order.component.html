@@ -103,8 +103,8 @@
         <input
           type="tel"
           [value]="phone()"
-          (input)="phone.set($any($event.target).value); saveFormToSession()"
-          placeholder="Ej: +56 9 1234 5678"
+          (input)="formatPhoneInput($event)"
+          placeholder="Ej: +569 1234 5678"
           maxlength="18"
           autocomplete="tel"
           inputmode="tel"
@@ -356,15 +356,17 @@
               ¿Con cuánto vas a pagar? *
             </label>
             <input
-              type="number"
+              type="text"
               [value]="cashAmount()"
-              (input)="cashAmount.set($any($event.target).value)"
+              (input)="formatCashInput($event)"
               [placeholder]="'Monto mínimo: ' + formatPrice(total())"
               class="w-full px-3 py-2.5 rounded-lg font-body text-sm text-brand-white outline-none"
               style="background: #242424; border: 1px solid #2A2A2A;"
               (focus)="$event.target.style.borderColor='#F07800'"
               (blur)="$event.target.style.borderColor='#2A2A2A'"
-              min="0"
+              inputmode="numeric"
+              autocomplete="off"
+              maxlength="10"
             />
             @if (cashAmount().length > 0 && !isCashAmountValid()) {
               <p class="font-body text-xs mt-1" style="color: #f87171;">

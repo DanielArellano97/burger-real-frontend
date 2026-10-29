@@ -145,7 +145,7 @@ export class ConfirmOrderComponent implements OnInit {
       try {
         const data = JSON.parse(saved);
         if (data.name)           this.name.set(data.name);
-        if (data.phone)          this.phone.set(data.phone);
+        if (data.phone)          this.phone.set(this.formatPhone(data.phone));
         if (data.deliveryMethod) this.deliveryMethod.set(data.deliveryMethod);
         if (data.paymentMethod)  this.paymentMethod.set(data.paymentMethod);
         if (data.notes)          this.notes.set(data.notes);
@@ -167,6 +167,65 @@ export class ConfirmOrderComponent implements OnInit {
 
   formatPrice(n: number): string {
     return this.whatsappService.formatPrice(n);
+  }
+
+  /**
+   * Formatea el teléfono mientras se escribe: +569 1234 5678.
+   * Acepta que el usuario pegue el número con espacios, guiones o +56.
+   */
+  formatPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = this.formatPhone(input.value);
+    this.phone.set(formatted);
+    input.value = formatted;
+    this.saveFormToSession();
+  }
+
+  private formatPhone(raw: string): string {
+    let digits = raw.replace(/\D/g, '');
+
+    // Si viene con el código país, se descarta para no duplicarlo.
+    if (digits.startsWith('56')) {
+      digits = digits.slice(2);
+    }
+
+    // 1 dígito de área/móvil + 8 dígitos del número.
+    digits = digits.slice(0, 9);
+    if (!digits) return '';
+
+    const subscriber = digits.slice(1);
+    let formatted = `+56${digits[0]}`;
+
+    if (subscriber.length > 0) {
+      formatted += ` ${subscriber.slice(0, 4)}`;
+    }
+    if (subscriber.length > 4) {
+      formatted += ` ${subscriber.slice(4, 8)}`;
+    }
+
+    return formatted;
+  }
+
+  /**
+   * Formatea el monto en efectivo mientras se escribe: $3.990.
+   * El cálculo interno sigue usando solo los dígitos.
+   */
+  formatCashInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = this.formatCash(input.value);
+    this.cashAmount.set(formatted);
+    input.value = formatted;
+  }
+
+  private formatCash(raw: string): string {
+    const digits = raw
+      .replace(/\D/g, '')
+      .replace(/^0+(?=\d)/, '')
+      .slice(0, 7);
+
+    if (!digits) return '';
+
+    return '$' + digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
   saveFormToSession(): void {
