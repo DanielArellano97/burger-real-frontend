@@ -86,7 +86,11 @@ export interface Product {
   /** Precio unitario cuando el producto se vende dentro de un combo. Si falta, se usa `price`. */
   comboPrice?: number;
   category: ProductCategory;
-  image?: string;
+  /**
+   * URL de la imagen del producto: Cloudinary (https://res.cloudinary.com/...)
+   * o un asset local (assets/images/...). Si falta, la tarjeta muestra un ícono.
+   */
+  imageUrl?: string;
   customizable: boolean;
   ingredients: Ingredient[];
   variants?: SizeVariant[];

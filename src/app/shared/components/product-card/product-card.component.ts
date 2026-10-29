@@ -26,9 +26,9 @@ import { DrinkSelectorModalComponent, DrinkSelectorModalData, DrinkSelectorModal
         <!-- Fila superior: imagen + info -->
         <div class="flex items-start gap-3 p-3 pb-2">
           <div class="relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-brand-surface-2">
-            @if (product().image && !imgError()) {
+            @if (product().imageUrl && !imgError()) {
               <img
-                [src]="product().image"
+                [src]="product().imageUrl"
                 [alt]="product().name"
                 class="w-full h-full object-cover"
                 loading="lazy"
@@ -96,9 +96,9 @@ import { DrinkSelectorModalComponent, DrinkSelectorModalData, DrinkSelectorModal
       >
         <!-- Product image -->
         <div class="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden bg-brand-surface-2">
-          @if (product().image && !imgError()) {
+          @if (product().imageUrl && !imgError()) {
             <img
-              [src]="product().image"
+              [src]="product().imageUrl"
               [alt]="product().name"
               class="w-full h-full object-cover"
               loading="lazy"

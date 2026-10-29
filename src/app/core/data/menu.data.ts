@@ -21,7 +21,7 @@ interface ProductReceta {
   comboPrice?: number;
   category: Product['category'];
   customizable: boolean;
-  image?: string;
+  imageUrl?: string;
   allowExtras?: boolean;
   variants?: SizeVariant[];
   incluye?: IncludedProduct[];
@@ -69,8 +69,12 @@ function buildIngredients(recipe: RecipeLine[]): Ingredient[] {
 
 const PRODUCTS_RECETA: ProductReceta[] = [
   // ─── Hamburguesas ───
+  // Cada burger acepta `imageUrl` con la URL pública de Cloudinary.
+  // Formato: https://res.cloudinary.com/tu-cuenta/image/upload/burger-real/<archivo>.webp
+  // Para usarla, descomenta la línea de la burger y pega tu URL.
   {
     id: 1,
+    // imageUrl: 'https://res.cloudinary.com/tu-cuenta/image/upload/burger-real/cheese-burger.webp',
     name: 'Cheese Burger',
     description: 'Pan brioche, medallón 100g y cheddar americano. Nuestra clásica',
     price: 4490,
@@ -86,6 +90,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
   },
   {
     id: 2,
+    // imageUrl: 'https://res.cloudinary.com/tu-cuenta/image/upload/burger-real/cheese-bacon.webp',
     name: 'Cheese Bacon',
     description: 'Pan brioche, medallón 100g, cheddar americano y tocino ahumado.',
     price: 5190,
@@ -187,6 +192,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     price: 6190,
     category: 'hamburguesas',
     customizable: true,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793297298/Hamburguesa_gourmet_con_guacamole_y_cheddar.png',
     incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
@@ -204,6 +210,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     precioOferta: 5190,
     category: 'hamburguesas',
     customizable: true,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793296282/Hamburguesa_gourmet_con_huevo_y_guacamole.png',
     incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
@@ -221,6 +228,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     precioOferta: 4590,
     category: 'hamburguesas',
     customizable: true,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793297458/Hamburguesa_gourmet_con_huevo_frito.png',
     incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
@@ -239,7 +247,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     price: 1990,
     category: 'acompañamientos',
     customizable: true,
-    image: 'assets/images/papas.webp',
+    imageUrl: 'assets/images/papas.webp',
     variants: [
       { id: 501, name: 'Porción Normal (150g)', shortName: '150g', extraPrice: 0 },
       { id: 502, name: 'Porción Mediana (250g)', shortName: '250g', extraPrice: 2990 },
@@ -257,7 +265,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     category: 'acompañamientos',
     customizable: true,
     allowExtras: false,
-    image: 'assets/images/aritos.webp',
+    imageUrl: 'assets/images/aritos.webp',
     variants: [
       { id: 601, name: 'Porción Normal (x5)', shortName: 'x5', extraPrice: 0, comboPrice: 1000 },
       { id: 602, name: 'Porción Mediana (x10)', shortName: 'x10', extraPrice: 2390, comboPrice: 2000 },
@@ -273,7 +281,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     category: 'acompañamientos',
     customizable: true,
     allowExtras: false,
-    image: 'assets/images/aritos.webp',
+    imageUrl: 'assets/images/aritos.webp',
     variants: [
       { id: 701, name: 'Porción Normal (x3)', shortName: 'x3', extraPrice: 0, comboPrice: 1500 },
       { id: 702, name: 'Porción Mediana (x6)', shortName: 'x6', extraPrice: 3390, comboPrice: 3000 },
