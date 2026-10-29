@@ -7,7 +7,7 @@
       <span class="font-body text-sm">Volver al menú</span>
     </button>
     <h1 class="font-display text-3xl text-brand-white">Confirmar Pedido</h1>
-    <p class="font-body text-sm mt-1" style="color: #888;">Revisá tu pedido y completá tus datos</p>
+    <p class="font-body text-sm mt-1" style="color: #888;">Revisa tu pedido y completa tus datos</p>
   </div>
 
   <!-- Bloque 0: Resumen del pedido -->
@@ -115,7 +115,7 @@
         />
         @if (phone().length > 3 && !isPhoneValid()) {
           <p class="font-body text-xs mt-1" style="color: #f87171;">
-            Ingresa un número chileno válido (ej: +569 1234 5678)
+            Ingresa un número válido (ej: +569 1234 5678)
           </p>
         }
       </div>
@@ -137,7 +137,7 @@
           [style.border]="deliveryMethod() === 'pickup' ? '1px solid #F07800' : '1px solid #2A2A2A'"
         >
           <span>🏢</span>
-          <span>Retiro en Local</span>
+          <span>Retiro</span>
         </button>
         <button
           (click)="deliveryMethod.set('delivery'); saveFormToSession()"
@@ -223,7 +223,7 @@
                   class="w-full py-2 rounded-lg font-heading font-semibold text-xs transition-all"
                   style="background: #F07800; color: #0F0F0F;"
                 >
-                  Cambiar a retiro en local
+                  Cambiar a retiro
                 </button>
               } @else {
                 <p class="font-body text-sm" style="color: #F0DCC8;">
