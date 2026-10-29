@@ -82,8 +82,11 @@
         <input
           type="text"
           [value]="name()"
-          (input)="name.set(sanitize($any($event.target).value)); saveFormToSession()"
+          (input)="name.set($any($event.target).value); saveFormToSession()"
           placeholder="Ej: Juan Pérez"
+          maxlength="80"
+          autocomplete="name"
+          autocapitalize="words"
           class="w-full px-3 py-2.5 rounded-lg font-body text-sm text-brand-white outline-none transition-colors"
           style="background: #242424; border: 1px solid #2A2A2A;"
           (focus)="$any($event.target).style.borderColor='#F07800'"
@@ -91,7 +94,7 @@
         />
         @if (name().length > 0 && !isNameValid()) {
           <p class="font-body text-xs mt-1" style="color: #f87171;">
-            Solo se permiten letras y espacios
+            Usa solo letras, espacios, apóstrofes o guiones (máx. 80 caracteres)
           </p>
         }
       </div>
@@ -102,6 +105,9 @@
           [value]="phone()"
           (input)="phone.set($any($event.target).value); saveFormToSession()"
           placeholder="Ej: +56 9 1234 5678"
+          maxlength="18"
+          autocomplete="tel"
+          inputmode="tel"
           class="w-full px-3 py-2.5 rounded-lg font-body text-sm text-brand-white outline-none transition-colors"
           style="background: #242424; border: 1px solid #2A2A2A;"
           (focus)="$any($event.target).style.borderColor='#F07800'"
@@ -147,6 +153,11 @@
 
       @if (deliveryMethod() === 'delivery') {
         <div class="space-y-3">
+          <!-- Aviso de privacidad de ubicación -->
+          <p class="font-body text-xs leading-relaxed" style="color: #888;">
+            📍 Usamos tu ubicación solo para calcular la distancia y el costo del delivery. No se guarda en ningún servidor.
+          </p>
+
           <!-- Botón GPS -->
           <button
             (click)="requestGPS()"
@@ -258,8 +269,10 @@
             <input
               type="text"
               [value]="address()"
-              (input)="address.set(sanitize($any($event.target).value)); saveFormToSession()"
+              (input)="address.set($any($event.target).value); saveFormToSession()"
               placeholder="Ej: Av. Los Aromos 123, Depto 4B — Edificio azul, saldré a buscar"
+              maxlength="160"
+              autocomplete="street-address"
               class="w-full px-3 py-2.5 rounded-lg font-body text-sm text-brand-white outline-none"
               style="background: #242424; border: 1px solid #2A2A2A;"
               (focus)="$event.target.style.borderColor='#F07800'"
@@ -397,9 +410,11 @@
     <div class="px-4 py-4">
       <textarea
         [value]="notes()"
-        (input)="notes.set(sanitize($any($event.target).value)); saveFormToSession()"
+        (input)="notes.set($any($event.target).value); saveFormToSession()"
         placeholder="Ej: Sin sal en las papas, medallón bien cocido, sin salsa..."
         rows="3"
+        maxlength="280"
+        autocomplete="off"
         class="w-full px-3 py-2.5 rounded-lg font-body text-sm text-brand-white outline-none transition-colors resize-none"
         style="background: #242424; border: 1px solid #2A2A2A;"
         (focus)="$any($event.target).style.borderColor='#F07800'"
@@ -422,6 +437,27 @@
       </svg>
       Confirmar y Enviar por WhatsApp
     </button>
+
+    @if (whatsappFallbackUrl(); as url) {
+      <div class="mt-3 rounded-xl p-3 space-y-2" style="background: #2A1B1B; border: 1px solid #5A2A2A;">
+        <p class="font-heading font-semibold text-sm" style="color: #F0B45A;">
+          El navegador bloqueó la ventana de WhatsApp
+        </p>
+        <p class="font-body text-xs leading-relaxed" style="color: #F0DCC8;">
+          Tu carrito y tus datos siguen guardados. Abre el pedido con este enlace:
+        </p>
+        <a
+          [href]="url"
+          target="_blank"
+          rel="noopener noreferrer"
+          (click)="onFallbackOpened()"
+          class="flex items-center justify-center gap-2 w-full py-3 rounded-lg font-heading font-bold text-sm"
+          style="background: #25D366; color: #ffffff;"
+        >
+          Abrir WhatsApp manualmente
+        </a>
+      </div>
+    }
   </div>
 
 </div>

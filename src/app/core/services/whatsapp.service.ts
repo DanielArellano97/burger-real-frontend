@@ -197,9 +197,14 @@ export class WhatsappService {
       }
 
       if (order.notes) {
-        msg += '\n';
-        msg += `📝 *NOTAS*\n`;
-        msg += `• ${order.notes}\n`;
+        // Las notas son una sola línea en el mensaje: si el cliente pega
+        // saltos de línea, no puede simular secciones como "TOTAL".
+        const notas = order.notes.replace(/\s*\r?\n+\s*/g, ' ').trim();
+        if (notas) {
+          msg += '\n';
+          msg += `📝 *NOTAS*\n`;
+          msg += `• ${notas}\n`;
+        }
       }
 
       if (order.paymentMethod === 'transfer') {
@@ -223,9 +228,35 @@ export class WhatsappService {
     return msg;
   }
 
-  sendOrder(items: CartItem[], order?: OrderData): void {
+  /**
+   * Arma la URL de WhatsApp sin abrirla. Útil para el enlace de respaldo
+   * cuando el navegador bloquea la ventana emergente.
+   */
+  buildUrl(items: CartItem[], order?: OrderData): string {
     const msg = this.buildMessage(items, order);
-    const url = `https://wa.me/${environment.whatsappNumber}?text=${encodeURIComponent(msg)}`;
-    window.open(url, '_blank');
+    return `https://wa.me/${environment.whatsappNumber}?text=${encodeURIComponent(msg)}`;
+  }
+
+  /**
+   * Abre WhatsApp en una pestaña nueva. Devuelve `opened: false` si el
+   * navegador bloqueó la ventana, para no vaciar el carrito por error.
+   */
+  sendOrder(items: CartItem[], order?: OrderData): { opened: boolean; url: string } {
+    const url = this.buildUrl(items, order);
+    const win = window.open(url, '_blank');
+
+    if (!win) {
+      return { opened: false, url };
+    }
+
+    // Equivale a rel="noopener": la pestaña de WhatsApp no puede manipular
+    // esta app a través de window.opener.
+    try {
+      win.opener = null;
+    } catch {
+      // Algunos navegadores no permiten tocar opener; la pestaña sigue abierta.
+    }
+
+    return { opened: true, url };
   }
 }

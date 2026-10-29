@@ -32,19 +32,30 @@ export class ConfirmOrderComponent implements OnInit {
 
   paymentMethod = signal<'transfer' | 'cash'>('transfer');
   copied        = signal(false);
+  /** URL de respaldo cuando el navegador bloquea la ventana de WhatsApp. */
+  whatsappFallbackUrl = signal<string | null>(null);
 
   notes      = signal('');
   cashAmount = signal('');
 
   bankDetails = environment.bankDetails;
 
-  isNameValid = computed(() =>
-    /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(this.name().trim()) &&
-    this.name().trim().length > 0
+  isNameValid = computed(() => {
+    const value = this.name().trim();
+    return (
+      value.length > 0 &&
+      value.length <= 80 &&
+      /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ'’.\-\s]+$/.test(value)
+    );
+  });
+
+  /** Ignora espacios, guiones y paréntesis al validar el teléfono. */
+  private phoneNormalizado = computed(() =>
+    this.phone().replace(/[\s\-().]/g, '')
   );
 
   isPhoneValid = computed(() =>
-    /^\+56[2-9]\d{8}$/.test(this.phone().trim())
+    /^\+56[2-9]\d{8}$/.test(this.phoneNormalizado())
   );
 
   cashAmountNumber = computed(() => {
@@ -156,10 +167,6 @@ export class ConfirmOrderComponent implements OnInit {
 
   formatPrice(n: number): string {
     return this.whatsappService.formatPrice(n);
-  }
-
-  sanitize(value: string): string {
-    return value.replace(/[<>\/'";<>]/g, '');
   }
 
   saveFormToSession(): void {
@@ -315,7 +322,28 @@ export class ConfirmOrderComponent implements OnInit {
       distanceKm:     deliveryInfo?.km ?? null,
     };
 
-    this.whatsappService.sendOrder(this.cartService.cartItems(), orderData);
+    const { opened, url } = this.whatsappService.sendOrder(
+      this.cartService.cartItems(),
+      orderData
+    );
+
+    if (!opened) {
+      // El popup fue bloqueado: no borramos nada y mostramos un enlace
+      // directo para que el cliente no pierda el pedido.
+      this.whatsappFallbackUrl.set(url);
+      return;
+    }
+
+    this.finalizeOrder();
+  }
+
+  /** Se ejecuta cuando el cliente usa el enlace de respaldo de WhatsApp. */
+  onFallbackOpened(): void {
+    this.finalizeOrder();
+  }
+
+  private finalizeOrder(): void {
+    this.whatsappFallbackUrl.set(null);
     sessionStorage.removeItem(this.STORAGE_KEY);
     this.cartService.clearCart();
     this.router.navigate(['/menu']);
