@@ -113,9 +113,9 @@
           (focus)="$any($event.target).style.borderColor='#F07800'"
           (blur)="$any($event.target).style.borderColor='#2A2A2A'"
         />
-        @if (phone().length > 3 && !isPhoneValid()) {
+        @if (phone().length > 4 && !isPhoneValid()) {
           <p class="font-body text-xs mt-1" style="color: #f87171;">
-            Ingresa un número válido (ej: +569 1234 5678)
+            Ingresa un celular chileno válido (ej: +569 1234 5678)
           </p>
         }
       </div>

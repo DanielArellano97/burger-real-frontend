@@ -55,7 +55,7 @@ export class ConfirmOrderComponent implements OnInit {
   );
 
   isPhoneValid = computed(() =>
-    /^\+56[2-9]\d{8}$/.test(this.phoneNormalizado())
+    /^\+569\d{8}$/.test(this.phoneNormalizado())
   );
 
   cashAmountNumber = computed(() => {
@@ -183,18 +183,21 @@ export class ConfirmOrderComponent implements OnInit {
 
   private formatPhone(raw: string): string {
     let digits = raw.replace(/\D/g, '');
+    const teniaCodigoPais = digits.startsWith('56');
 
-    // Si viene con el código país, se descarta para no duplicarlo.
-    if (digits.startsWith('56')) {
+    if (teniaCodigoPais) {
+      // Se descarta el +56 y el 9 que ya forman parte del prefijo fijo.
       digits = digits.slice(2);
+      if (digits.startsWith('9')) {
+        digits = digits.slice(1);
+      }
+    } else if (digits.length === 9 && digits.startsWith('9')) {
+      // Número pegado completo (9 + 8 dígitos) sin el +56.
+      digits = digits.slice(1);
     }
 
-    // 1 dígito de área/móvil + 8 dígitos del número.
-    digits = digits.slice(0, 9);
-    if (!digits) return '';
-
-    const subscriber = digits.slice(1);
-    let formatted = `+56${digits[0]}`;
+    const subscriber = digits.slice(0, 8);
+    let formatted = '+569';
 
     if (subscriber.length > 0) {
       formatted += ` ${subscriber.slice(0, 4)}`;
