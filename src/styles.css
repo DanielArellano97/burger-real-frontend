@@ -70,6 +70,20 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+/*
+ * iOS Safari hace zoom automático al enfocar un input o textarea cuya
+ * fuente sea menor a 16px. Ese zoom a veces queda activo al cerrar el
+ * teclado y desborda el layout. Con 16px se evita el zoom de raíz.
+ */
+@media (max-width: 767px), (hover: none) and (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 }
 
 body {
