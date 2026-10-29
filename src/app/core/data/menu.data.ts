@@ -128,6 +128,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     precioOferta: 3990,
     category: 'hamburguesas',
     customizable: true,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793300205/Hamburguesa_gourmet_con_aros_de_cebolla.png',
     incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
@@ -160,6 +161,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     price: 5690,
     category: 'hamburguesas',
     customizable: true,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793299884/Hamburguesa_doble_con_cebolla_caramelizada.png',
     incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
