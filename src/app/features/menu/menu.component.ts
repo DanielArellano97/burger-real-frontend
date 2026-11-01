@@ -6,8 +6,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { fromEvent } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Dialog } from '@angular/cdk/dialog';
+import { LucideMaximize2 } from '@lucide/angular';
 import { CATEGORIES } from '../../core/data/menu.data';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
+import { openImageLightbox } from '../../shared/components/image-lightbox/image-lightbox.component';
 import { CartService } from '../../core/services/cart.service';
 import { Combo, ComboDetalle } from '../../core/models/combo.model';
 import { BurgerEnOferta, burgerDelDia, claveDelDia, esDiaDeOferta } from '../../core/utils/burger-of-the-week';
@@ -40,7 +42,7 @@ type CategoryKey = (typeof CATEGORIES)[number]['key'];
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [ProductCardComponent],
+  imports: [ProductCardComponent, LucideMaximize2],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './menu.component.html',
 })
@@ -253,6 +255,17 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
         index + 1,
         [...variantesElegidas, result.selectedVariant]
       );
+    });
+  }
+
+  /** Abre en grande la foto de la burger de la semana. */
+  openWeeklyImage(): void {
+    const burger = this.burgerOfTheWeek();
+    if (!burger) return;
+
+    openImageLightbox(this.dialog, {
+      src: burger.imageUrl || this.burgerFallbackImage,
+      alt: burger.name,
     });
   }
 

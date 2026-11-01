@@ -1,9 +1,10 @@
 import { Component, inject, computed, input, signal } from '@angular/core';
 import { Dialog } from '@angular/cdk/dialog';
-import { LucidePlus, LucideMinus, LucideImageOff, LucideSlidersHorizontal, LucidePencil } from '@lucide/angular';
+import { LucidePlus, LucideMinus, LucideImageOff, LucideSlidersHorizontal, LucidePencil, LucideMaximize2 } from '@lucide/angular';
 import { Product } from '../../../core/models/product.model';
 import { CartService } from '../../../core/services/cart.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { openImageLightbox } from '../image-lightbox/image-lightbox.component';
 import {
   IngredientModalComponent,
   IngredientModalData,
@@ -14,7 +15,7 @@ import { DrinkSelectorModalComponent, DrinkSelectorModalData, DrinkSelectorModal
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [LucidePlus, LucideMinus, LucideImageOff, LucideSlidersHorizontal, LucidePencil],
+  imports: [LucidePlus, LucideMinus, LucideImageOff, LucideSlidersHorizontal, LucidePencil, LucideMaximize2],
   template: `
     @if (product().category === 'hamburguesas') {
       <!-- HAMBURGUESA LAYOUT: imagen+info arriba, botones full-width abajo -->
@@ -27,13 +28,27 @@ import { DrinkSelectorModalComponent, DrinkSelectorModalData, DrinkSelectorModal
         <div class="flex items-start gap-3 p-3 pb-2">
           <div class="relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-brand-surface-2">
             @if (product().imageUrl && !imgError()) {
-              <img
-                [src]="product().imageUrl"
-                [alt]="product().name"
-                class="w-full h-full object-cover"
-                loading="lazy"
-                (error)="imgError.set(true)"
-              />
+              <button
+                type="button"
+                (click)="openImage()"
+                class="relative block w-full h-full cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+                [attr.aria-label]="'Ampliar imagen de ' + product().name"
+              >
+                <img
+                  [src]="product().imageUrl"
+                  [alt]="product().name"
+                  class="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
+                  loading="lazy"
+                  (error)="imgError.set(true)"
+                />
+                <span
+                  class="absolute flex items-center justify-center w-5 h-5 rounded-md"
+                  style="right: 3px; bottom: 3px; background: rgba(0,0,0,0.55); color: #F0F0F0;"
+                  aria-hidden="true"
+                >
+                  <svg lucideMaximize2 class="w-3 h-3"></svg>
+                </span>
+              </button>
             } @else {
               <div class="w-full h-full flex items-center justify-center">
                 <svg lucideImageOff class="w-8 h-8" aria-hidden="true" style="color: #3A3A3A;"></svg>
@@ -97,13 +112,27 @@ import { DrinkSelectorModalComponent, DrinkSelectorModalData, DrinkSelectorModal
         <!-- Product image -->
         <div class="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden bg-brand-surface-2">
           @if (product().imageUrl && !imgError()) {
-            <img
-              [src]="product().imageUrl"
-              [alt]="product().name"
-              class="w-full h-full object-cover"
-              loading="lazy"
-              (error)="imgError.set(true)"
-            />
+            <button
+              type="button"
+              (click)="openImage()"
+              class="relative block w-full h-full cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+              [attr.aria-label]="'Ampliar imagen de ' + product().name"
+            >
+              <img
+                [src]="product().imageUrl"
+                [alt]="product().name"
+                class="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
+                loading="lazy"
+                (error)="imgError.set(true)"
+              />
+              <span
+                class="absolute flex items-center justify-center w-5 h-5 rounded-md"
+                style="right: 3px; bottom: 3px; background: rgba(0,0,0,0.55); color: #F0F0F0;"
+                aria-hidden="true"
+              >
+                <svg lucideMaximize2 class="w-3 h-3"></svg>
+              </span>
+            </button>
           } @else {
             <div class="w-full h-full flex items-center justify-center">
               <svg lucideImageOff class="w-8 h-8" aria-hidden="true" style="color: #3A3A3A;"></svg>
@@ -229,6 +258,17 @@ export class ProductCardComponent {
 
   formatPrice(n: number): string {
     return `$${n.toLocaleString('es-CL')}`;
+  }
+
+  /** Abre la foto del producto en grande. */
+  openImage(): void {
+    const product = this.product();
+    if (!product.imageUrl) return;
+
+    openImageLightbox(this.dialog, {
+      src: product.imageUrl,
+      alt: product.name,
+    });
   }
 
   openModal(): void {
