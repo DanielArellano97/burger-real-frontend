@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { LucideChevronLeft, LucideCheck, LucideCopy } from '@lucide/angular';
 import { CartService } from '../../core/services/cart.service';
@@ -39,6 +39,22 @@ export class ConfirmOrderComponent implements OnInit {
   cashAmount = signal('');
 
   bankDetails = environment.bankDetails;
+
+  /** Evita que el redirect automático se dispare dos veces al finalizar un pedido. */
+  private redirigiendoAlMenu = false;
+
+  constructor() {
+    // Si el carrito se vacía estando en esta pantalla (por ejemplo, al
+    // eliminarlo desde el carrito), no hay nada que confirmar: volvemos al menú.
+    effect(() => {
+      if (this.cartService.cartItems().length > 0) return;
+      if (this.redirigiendoAlMenu) return;
+
+      this.redirigiendoAlMenu = true;
+      this.cartService.closeDrawer();
+      this.router.navigate(['/menu']);
+    });
+  }
 
   isNameValid = computed(() => {
     const value = this.name().trim();
@@ -405,6 +421,7 @@ export class ConfirmOrderComponent implements OnInit {
   }
 
   private finalizeOrder(): void {
+    this.redirigiendoAlMenu = true;
     this.whatsappFallbackUrl.set(null);
     sessionStorage.removeItem(this.STORAGE_KEY);
     this.cartService.clearCart();
