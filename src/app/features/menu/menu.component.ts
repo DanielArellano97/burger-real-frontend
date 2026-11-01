@@ -61,6 +61,35 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly burgerFallbackImage =
     'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=400&fit=crop';
 
+  /**
+   * Imagen del hero semanal con recorte inteligente de Cloudinary
+   * (`c_fill,g_auto`): llena la tarjeta y centra el encuadre en la burger.
+   * Si la URL no es de Cloudinary o ya trae transformaciones, se usa tal cual.
+   */
+  burgerImage = computed(() =>
+    this.recorteInteligente(
+      this.burgerOfTheWeek()?.imageUrl || this.burgerFallbackImage
+    )
+  );
+
+  private recorteInteligente(url: string): string {
+    if (!url.startsWith('https://res.cloudinary.com/')) return url;
+
+    const marcador = '/image/upload/';
+    const posicion = url.indexOf(marcador);
+    if (posicion === -1) return url;
+
+    // Si el primer segmento no es una versión (`v123...`), ya hay una
+    // transformación aplicada y se respeta para no encadenar recortes.
+    const primerSegmento = url.slice(posicion + marcador.length).split('/')[0];
+    if (!/^v\d+$/.test(primerSegmento)) return url;
+
+    return url.replace(
+      marcador,
+      `${marcador}c_fill,g_auto,w_800,h_500/`
+    );
+  }
+
   loading = this.productoService.loading;
   error   = this.productoService.error;
 

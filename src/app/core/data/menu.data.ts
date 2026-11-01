@@ -182,7 +182,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     price: 5690,
     category: 'hamburguesas',
     customizable: true,
-    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793551840/Hamburguesa_gourmet_con_cebolla_caramelizada_y_tocino.png',
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793552082/Hamburguesa_doble_con_tocino_y_queso.png',
     incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
