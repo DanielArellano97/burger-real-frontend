@@ -57,6 +57,10 @@ export class MenuComponent implements OnInit, AfterViewInit, OnDestroy {
   combos = this.comboService.combos;
   activeTab = signal<CategoryKey>(CATEGORIES[0].key);
 
+  /** Imagen de respaldo si la burger de la semana no tiene `imageUrl`. */
+  readonly burgerFallbackImage =
+    'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=400&fit=crop';
+
   loading = this.productoService.loading;
   error   = this.productoService.error;
 
