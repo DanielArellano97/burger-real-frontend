@@ -81,6 +81,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     precioOferta: 3490,
     category: 'hamburguesas',
     customizable: true,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793550658/Cheeseburger_gourmet_con_queso_fundido.png',
     incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
@@ -96,6 +97,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     price: 5190,
     category: 'hamburguesas',
     customizable: true,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793551236/Hamburguesa_con_tocino_y_queso_fundido.png',
     incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
@@ -112,6 +114,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     precioOferta: 3990,
     category: 'hamburguesas',
     customizable: true,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793551481/Hamburguesa_con_cebolla_caramelizada.png',
     incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
@@ -144,6 +147,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     price: 6690,
     category: 'hamburguesas',
     customizable: true,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793551840/Hamburguesa_gourmet_con_cebolla_caramelizada_y_tocino.png',
     incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
@@ -178,6 +182,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     price: 5690,
     category: 'hamburguesas',
     customizable: true,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793551840/Hamburguesa_gourmet_con_cebolla_caramelizada_y_tocino.png',
     incluye: PAPAS_BURGER,
     recipe: [
       { ingredientId: 200, quantity: 1, isRequired: true },
@@ -301,6 +306,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     comboPrice: 1000,
     category: 'bebestibles',
     customizable: false,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793552615/WhatsApp_Image_2026-11-01_at_2.03.07_PM.jpg',
     recipe: [],
   },
   {
@@ -311,6 +317,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     comboPrice: 1000,
     category: 'bebestibles',
     customizable: false,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793552726/WhatsApp_Image_2026-11-01_at_2.05.15_PM.jpg',
     recipe: [],
   },
   {
@@ -321,6 +328,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     comboPrice: 1000,
     category: 'bebestibles',
     customizable: false,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793552838/WhatsApp_Image_2026-11-01_at_2.05.50_PM.jpg',
     recipe: [],
   },
   {
@@ -331,6 +339,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     comboPrice: 1000,
     category: 'bebestibles',
     customizable: false,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793553001/Gemini_Generated_Image_g9ac1eg9ac1eg9ac.jpg',
     recipe: [],
   },
   {
@@ -341,6 +350,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     comboPrice: 1000,
     category: 'bebestibles',
     customizable: false,
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793553109/Gemini_Generated_Image_jxmt8qjxmt8qjxmt.jpg',
     recipe: [],
   },
 ];
