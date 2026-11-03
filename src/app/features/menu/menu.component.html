@@ -106,9 +106,9 @@
       <img [src]="combo.imageUrl" [alt]="combo.name"
         style="width: 100%; height: 75px; object-fit: cover; display: block;" loading="lazy" />
       <div class="p-2">
-        <p style="color: #F0F0F0; font-size: 11px; font-weight: 600; line-height: 1.3;">{{ combo.name }}</p>
+        <p style="color: #F0F0F0; font-size: 13px; font-weight: 600; line-height: 1.3;">{{ combo.name }}</p>
         <div class="flex items-center justify-between mt-1">
-          <p style="color: #F07800; font-size: 12px; font-weight: 700;">{{ formatPrice(combo.price) }}</p>
+          <p style="color: #F07800; font-size: 13px; font-weight: 700;">{{ formatPrice(combo.price) }}</p>
           <button (click)="openComboDetail(combo)"
             class="flex items-center justify-center w-6 h-6 rounded-full transition-colors hover:opacity-70 font-heading font-bold text-xs"
             style="color: #d89f03; border: 1px solid #d89f03;" [attr.aria-label]="'Ver qué incluye ' + combo.name">

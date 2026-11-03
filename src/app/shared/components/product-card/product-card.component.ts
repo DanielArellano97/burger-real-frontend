@@ -57,8 +57,8 @@ import { DrinkSelectorModalComponent, DrinkSelectorModalData, DrinkSelectorModal
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-start justify-between gap-2">
-              <h3 class="font-heading font-semibold text-sm text-brand-white leading-tight">{{ product().name }}</h3>
-              <span class="font-heading font-bold text-sm text-brand-orange flex-shrink-0">{{ formatPrice(product().price) }}</span>
+              <h3 class="font-heading font-semibold text-base text-brand-white leading-tight">{{ product().name }}</h3>
+              <span class="font-heading font-bold text-lg text-brand-orange flex-shrink-0">{{ formatPrice(product().price) }}</span>
             </div>
             <p class="font-body text-xs mt-1 leading-relaxed" style="color: #888;">{{ product().description }}</p>
           </div>
@@ -151,7 +151,7 @@ import { DrinkSelectorModalComponent, DrinkSelectorModalData, DrinkSelectorModal
                 </h3>
                 <div style="text-align: right; flex-shrink: 0;">
                   <div style="color: #888; font-size: 10px; line-height: 1.2;">desde</div>
-                  <div style="color: #F07800; font-size: 13px; font-weight: 700;">{{ formatPrice(product().price) }}</div>
+                  <div style="color: #F07800; font-size: 14px; font-weight: 700;">{{ formatPrice(product().price) }}</div>
                 </div>
               </div>
               <p class="font-body text-xs text-brand-cream mt-0.5 line-clamp-2 leading-relaxed">

@@ -229,7 +229,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
   },
   {
     id: 10,
-    name: 'La Trilogía del Rey (by @selvaenlaluna)',
+    name: 'La Trilogía del Rey',
     description: 'Pan brioche, medallón de 100g, cheddar americano, cebolla caramelizada y huevo frito',
     price: 5590,
     precioOferta: 4590,
