@@ -95,7 +95,7 @@ const COMBOS_CONFIG: ComboConfig[] = [
     id: 1,
     name: 'Clásico',
     description: 'Cheese Burger + Papas 100g + Aritos de Cebolla (x5) + Bebida a elección',
-    imageUrl: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop',
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793733771/Gemini_Generated_Image_65saco65saco65sa.jpg',
     detalles: [
       {
         productoId: 1,
@@ -130,7 +130,7 @@ const COMBOS_CONFIG: ComboConfig[] = [
     id: 2,
     name: 'Sabroso',
     description: 'Onion Caramel Bacon + Papas 100g + Aritos de Cebolla (x5) + Bebida a elección',
-    imageUrl: 'https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400&h=300&fit=crop',
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793733896/Gemini_Generated_Image_9xugv79xugv79xug.jpg',
     detalles: [
       {
         productoId: 6,
@@ -164,7 +164,7 @@ const COMBOS_CONFIG: ComboConfig[] = [
     id: 3,
     name: 'Crunchy',
     description: 'Onion Ring Bacon + Papas 100g + Aritos de Cebolla (x5) + Bebida a elección',
-    imageUrl: 'https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=400&h=300&fit=crop',
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793734041/Gemini_Generated_Image_vuwz7pvuwz7pvuwz.jpg',
     detalles: [
       {
         productoId: 7,
@@ -198,7 +198,7 @@ const COMBOS_CONFIG: ComboConfig[] = [
     id: 4,
     name: 'Real',
     description: 'Real + Papas 100g + Aritos de Cebolla (x10) + Bebida a elección',
-    imageUrl: 'https://images.unsplash.com/photo-1562802378-063ec186a863?w=400&h=300&fit=crop',
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793734388/Gemini_Generated_Image_noldthnoldthnold_1.jpg',
     detalles: [
       {
         productoId: 5,
@@ -232,7 +232,7 @@ const COMBOS_CONFIG: ComboConfig[] = [
     id: 5,
     name: 'Doble Bacon',
     description: '2 x Cheese Bacon + 2 x Papas 100g + Aritos de Cebolla (x10) + 2 x Bebidas a elección',
-    imageUrl: 'https://images.unsplash.com/photo-1562802378-063ec186a863?w=400&h=300&fit=crop',
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793734551/Gemini_Generated_Image_w5nma3w5nma3w5nm.jpg',
     detalles: [
       {
         productoId: 2,
@@ -266,7 +266,7 @@ const COMBOS_CONFIG: ComboConfig[] = [
     id: 6,
     name: 'Real Real',
     description: '2 x Real + 2 x Papas 100g + 2 x Bebidas a elección',
-    imageUrl: 'https://images.unsplash.com/photo-1562802378-063ec186a863?w=400&h=300&fit=crop',
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793734829/Gemini_Generated_Image_v849q9v849q9v849.jpg',
     detalles: [
       {
         productoId: 5,
@@ -291,7 +291,7 @@ const COMBOS_CONFIG: ComboConfig[] = [
     id: 7,
     name: 'Pollo Real',
     description: 'Real + Papas 100g + Deditos de Pollo (x3) + Bebida a elección',
-    imageUrl: 'https://images.unsplash.com/photo-1562802378-063ec186a863?w=400&h=300&fit=crop',
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793735080/Gemini_Generated_Image_heeq5oheeq5oheeq.jpg',
     detalles: [
       {
         productoId: 5,

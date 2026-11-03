@@ -254,7 +254,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     price: 1990,
     category: 'acompañamientos',
     customizable: true,
-    imageUrl: 'assets/images/papas.webp',
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793732948/Papas_fritas_doradas_sazonadas_en_bandeja_checkered.png',
     variants: [
       { id: 501, name: 'Porción Normal (150g)', shortName: '150g', extraPrice: 0 },
       { id: 502, name: 'Porción Mediana (250g)', shortName: '250g', extraPrice: 2990 },
@@ -272,7 +272,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     category: 'acompañamientos',
     customizable: true,
     allowExtras: false,
-    imageUrl: 'assets/images/aritos.webp',
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793731529/Aros_de_cebolla_crujientes_en_pizarra.png',
     variants: [
       { id: 601, name: 'Porción Normal (x5)', shortName: 'x5', extraPrice: 0, comboPrice: 1000 },
       { id: 602, name: 'Porción Mediana (x10)', shortName: 'x10', extraPrice: 2390, comboPrice: 2000 },
@@ -288,7 +288,7 @@ const PRODUCTS_RECETA: ProductReceta[] = [
     category: 'acompañamientos',
     customizable: true,
     allowExtras: false,
-    imageUrl: 'assets/images/aritos.webp',
+    imageUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/v1793731757/Tiras_de_pollo_crujientes_doradas.png',
     variants: [
       { id: 701, name: 'Porción Normal (x3)', shortName: 'x3', extraPrice: 0, comboPrice: 1500 },
       { id: 702, name: 'Porción Mediana (x6)', shortName: 'x6', extraPrice: 3390, comboPrice: 3000 },
