@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { LucideChevronLeft, LucideCheck, LucideCopy } from '@lucide/angular';
 import { CartService } from '../../../application/cart.service';
 import { OrderService } from '../../../application/order.service';
+import { StoreStatusService } from '../../../application/store-status.service';
+import { StoreClosedBannerComponent } from '../../components/store-closed-banner/store-closed-banner.component';
 import { DELIVERY_CONFIG } from '../../../config/delivery.config';
 import { quoteDelivery, routeMapUrl } from '../../../domain/delivery/delivery';
 import { OrderData } from '../../../domain/order/order.models';
@@ -12,12 +14,13 @@ import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-confirm-order',
   standalone: true,
-  imports: [LucideChevronLeft, LucideCheck, LucideCopy],
+  imports: [LucideChevronLeft, LucideCheck, LucideCopy, StoreClosedBannerComponent],
   templateUrl: './confirm-order.component.html',
 })
 export class ConfirmOrderComponent implements OnInit {
   cartService = inject(CartService);
   private orderService = inject(OrderService);
+  readonly storeOpen = inject(StoreStatusService).isOpen;
   private router = inject(Router);
 
   private readonly STORAGE_KEY = 'burger-real-checkout-form';
@@ -153,7 +156,7 @@ export class ConfirmOrderComponent implements OnInit {
       (!this.deliveryFueraDeCobertura() &&
         (!!this.gpsCoords() || this.address().trim().length > 0));
     const cashOk = this.paymentMethod() === 'transfer' || this.isCashAmountValid();
-    return base && deliveryOk && cashOk;
+    return base && deliveryOk && cashOk && this.storeOpen();
   });
 
   ngOnInit(): void {

@@ -6,6 +6,7 @@ import { CartStorage } from '../domain/cart/cart.storage';
 import { dayKey } from '../domain/promo/burger-of-the-week';
 import { CatalogService } from './catalog.service';
 import { ClockService } from './clock.service';
+import { StoreStatusService } from './store-status.service';
 
 function generateId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
@@ -23,6 +24,7 @@ export class CartService {
   private readonly storage = inject(CartStorage);
   private readonly catalog = inject(CatalogService);
   private readonly clock = inject(ClockService);
+  private readonly store = inject(StoreStatusService);
 
   private readonly lines = signal<StoredCartLine[]>(parseStoredLines(this.storage.load()));
   private readonly today = computed(() => dayKey(this.clock.now()));
@@ -50,6 +52,11 @@ export class CartService {
 
   /* ─── Agregar ─── */
 
+  /** Fuera de horario no se puede agregar ni aumentar cantidades. */
+  get canAdd(): boolean {
+    return this.store.isOpen();
+  }
+
   /** Producto de carta (con su porción y personalización). Une líneas idénticas. */
   addProduct(product: Product, ingredients: readonly Ingredient[], portion: Portion | null = null): void {
     this.addProductLine({
@@ -62,10 +69,12 @@ export class CartService {
 
   /** "Burger de la semana": receta original, precio de oferta del día. */
   addPromo(product: Product, date: Date): void {
+    if (!this.canAdd) return;
     this.addProductLine({ productId: product.id, portionId: null, quantities: {}, promoDate: dayKey(date) });
   }
 
   addCombo(combo: Combo, selections: readonly ComboOption[]): void {
+    if (!this.canAdd) return;
     const selectionIds = selections.map(s => s.id);
     const key = selectionIds.join(',');
     const existing = this.lines().find(
@@ -83,6 +92,7 @@ export class CartService {
   }
 
   private addProductLine(line: Omit<StoredProductLine, 'kind' | 'id' | 'quantity'>): void {
+    if (!this.canAdd) return;
     const key = quantitiesKey(line.quantities);
     const existing = this.lines().find(
       (l): l is StoredProductLine =>
@@ -107,6 +117,8 @@ export class CartService {
       this.remove(id);
       return;
     }
+    const current = this.lines().find(l => l.id === id);
+    if (current && quantity > current.quantity && !this.canAdd) return;
     this.lines.update(lines => lines.map(l => (l.id === id ? { ...l, quantity } : l)));
   }
 

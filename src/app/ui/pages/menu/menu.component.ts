@@ -9,11 +9,13 @@ import { CartService } from '../../../application/cart.service';
 import { CatalogService } from '../../../application/catalog.service';
 import { ClockService } from '../../../application/clock.service';
 import { NotificationService } from '../../../application/notification.service';
+import { StoreStatusService } from '../../../application/store-status.service';
 import { Combo, ComboLine, ComboOption, Product, ProductCategory } from '../../../domain/catalog/catalog.models';
 import { OfferBurger, burgerOfTheDay, isOfferDay } from '../../../domain/promo/burger-of-the-week';
 import { formatPrice } from '../../../domain/shared/money';
 import { CATEGORIES } from '../../shared/categories';
 import { ProductCardComponent } from '../../components/product-card/product-card.component';
+import { StoreClosedBannerComponent } from '../../components/store-closed-banner/store-closed-banner.component';
 import { openImageLightbox } from '../../components/image-lightbox/image-lightbox.component';
 import { ComboModalComponent, ComboModalData, ComboModalResult } from '../../components/combo-modal/combo-modal.component';
 import {
@@ -40,7 +42,7 @@ const MODAL_OPTIONS = {
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [ProductCardComponent, LucideMaximize2],
+  imports: [ProductCardComponent, LucideMaximize2, StoreClosedBannerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './menu.component.html',
 })
@@ -59,6 +61,7 @@ export class MenuComponent implements AfterViewInit, OnDestroy {
   readonly error = this.catalog.error;
   readonly activeTab = signal<ProductCategory>(CATEGORIES[0].key);
   readonly formatPrice = formatPrice;
+  readonly storeOpen = inject(StoreStatusService).isOpen;
 
   /** Imagen de respaldo si la burger de la semana no tiene `imageUrl`. */
   readonly burgerFallbackImage =

@@ -5,6 +5,8 @@ import { A11yModule } from '@angular/cdk/a11y';
 import { Dialog } from '@angular/cdk/dialog';
 import { LucideX, LucideTrash2, LucidePlus, LucideMinus, LucideShoppingCart, LucidePencil } from '@lucide/angular';
 import { CartService } from '../../../application/cart.service';
+import { StoreStatusService } from '../../../application/store-status.service';
+import { StoreClosedBannerComponent } from '../../components/store-closed-banner/store-closed-banner.component';
 import { CartItem, ProductCartItem } from '../../../domain/cart/cart.models';
 import { comboLinesText } from '../../../domain/catalog/combo-format';
 import { formatPrice } from '../../../domain/shared/money';
@@ -15,7 +17,7 @@ import {
 @Component({
   selector: 'app-cart-drawer',
   standalone: true,
-  imports: [A11yModule, RouterLink, LucideX, LucideTrash2, LucidePlus, LucideMinus, LucideShoppingCart, LucidePencil],
+  imports: [A11yModule, RouterLink, StoreClosedBannerComponent, LucideX, LucideTrash2, LucidePlus, LucideMinus, LucideShoppingCart, LucidePencil],
   template: `
     @if (isVisible()) {
       <!-- Overlay -->
@@ -130,6 +132,7 @@ import {
                     </span>
                     <button
                       (click)="cartService.updateQuantity(item.id, item.quantity + 1)"
+                      [disabled]="!store.isOpen()"
                       class="w-6 h-6 flex items-center justify-center rounded bg-brand-orange text-brand-dark hover:opacity-90 transition-colors"
                       [attr.aria-label]="'Aumentar cantidad de ' + item.name"
                     >
@@ -169,6 +172,9 @@ import {
 
           <!-- Footer -->
           <div class="px-4 pt-5 pb-4 border-t" style="border-color: #2A2A2A;">
+            @if (!store.isOpen()) {
+              <div class="mb-4"><app-store-closed-banner /></div>
+            }
             <div class="flex items-center justify-between mb-4">
               <span class="font-heading text-base text-brand-cream">Total</span>
               <span class="font-display text-3xl text-brand-orange">
@@ -219,6 +225,7 @@ import {
 export class CartDrawerComponent implements OnDestroy {
   readonly cartService = inject(CartService);
   readonly formatPrice = formatPrice;
+  readonly store = inject(StoreStatusService);
   confirmingClear = signal(false);
   isVisible = signal(false);
   isClosing = signal(false);

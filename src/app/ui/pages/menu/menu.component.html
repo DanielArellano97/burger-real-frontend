@@ -16,6 +16,13 @@
     }
   </div>
 
+  <!-- ─── AVISO FUERA DE HORARIO ─── -->
+  @if (!storeOpen()) {
+  <div class="max-w-lg mx-auto px-4 pt-4">
+    <app-store-closed-banner />
+  </div>
+  }
+
   <!-- ─── ESTADOS: LOADING / ERROR / CONTENIDO ─── -->
   @if (loading()) {
   <div class="flex justify-center items-center py-20">
@@ -78,7 +85,7 @@
           @if (offerActive() && !bw.available) {
           <span class="font-heading font-semibold text-sm" style="color: #888; white-space: nowrap;">Agotado</span>
           } @else if (offerActive()) {
-          <button (click)="openBurgerOfTheWeekModal()"
+          <button (click)="openBurgerOfTheWeekModal()" [disabled]="!storeOpen()"
             class="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg font-heading font-semibold text-sm transition-all active:scale-95"
             style="background: #F07800; color: #0F0F0F; white-space: nowrap;"
             aria-label="Agregar burger de la semana al carrito">
@@ -127,11 +134,11 @@
           <button (click)="removeComboItem(combo)"
             style="color: #F07800; padding: 4px 6px; font-size: 14px; font-weight: 700;">−</button>
           <span style="color: #F0F0F0; font-size: 11px; font-weight: 700;">{{ getComboQuantity(combo) }}</span>
-          <button (click)="addComboToCart(combo)"
+          <button (click)="addComboToCart(combo)" [disabled]="!storeOpen()"
             style="color: #F07800; padding: 4px 6px; font-size: 14px; font-weight: 700;">+</button>
         </div>
         } @else {
-        <button (click)="addComboToCart(combo)"
+        <button (click)="addComboToCart(combo)" [disabled]="!storeOpen()"
           class="w-full mt-2 rounded-lg font-heading font-semibold transition-all flex items-center justify-center gap-1"
           style="background: #F07800; color: #000; font-size: 14px; height: 36px; border: none;">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"

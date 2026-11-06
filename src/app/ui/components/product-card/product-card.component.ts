@@ -5,6 +5,7 @@ import { Product } from '../../../domain/catalog/catalog.models';
 import { formatPrice } from '../../../domain/shared/money';
 import { CartService } from '../../../application/cart.service';
 import { NotificationService } from '../../../application/notification.service';
+import { StoreStatusService } from '../../../application/store-status.service';
 import { openImageLightbox } from '../image-lightbox/image-lightbox.component';
 import {
   IngredientModalComponent,
@@ -83,6 +84,7 @@ import {
               <span class="font-heading font-bold text-sm text-brand-white" aria-live="polite">{{ originalQuantity() }}</span>
               <button
                 (click)="increaseOriginal()"
+                [disabled]="!storeOpen()"
                 class="text-brand-orange font-bold text-lg px-1"
                 [attr.aria-label]="'Agregar otro ' + product().name"
               >+</button>
@@ -90,6 +92,7 @@ import {
           } @else {
             <button
               (click)="addOriginal()"
+                [disabled]="!storeOpen()"
               class="w-[44%] flex items-center justify-center gap-2 h-[44px] rounded-xl font-heading font-semibold text-sm transition-all active:scale-95"
               style="background: #F07800; color: #0F0F0F;"
               [attr.aria-label]="'Agregar ' + product().name + ' al carrito'"
@@ -100,6 +103,7 @@ import {
           }
           <button
             (click)="openModal()"
+                [disabled]="!storeOpen()"
             class="flex-1 flex items-center justify-center gap-2 h-[44px] rounded-xl font-heading font-semibold text-sm transition-all active:scale-95 border"
             style="background: transparent; color: #F07800; border-color: #F07800;"
             [attr.aria-label]="'Personalizar ' + product().name"
@@ -172,6 +176,7 @@ import {
             <div class="flex items-center justify-end mt-2">
               <button
                 (click)="openModal()"
+                [disabled]="!storeOpen()"
                 class="flex items-center gap-1 px-3 py-1.5 rounded-lg font-heading font-semibold text-sm transition-all duration-150 border hover:opacity-90 active:scale-95"
                 style="border-color: #F07800; color: #F07800; background: rgba(240,120,0,0.08);"
                 [attr.aria-label]="'Elegir porción de ' + product().name"
@@ -200,6 +205,7 @@ import {
               } @else if (quantity() === 0) {
                 <button
                   (click)="add()"
+                [disabled]="!storeOpen()"
                   class="flex items-center gap-1 px-3 h-[36px] rounded-lg font-heading font-semibold text-sm transition-all duration-150 hover:opacity-90 active:scale-95"
                   style="background: #F07800; color: #0F0F0F;"
                   [attr.aria-label]="'Agregar ' + product().name + ' al carrito'"
@@ -221,6 +227,7 @@ import {
                   </span>
                   <button
                     (click)="increase()"
+                [disabled]="!storeOpen()"
                     class="w-[36px] h-[36px] flex items-center justify-center rounded-md bg-brand-orange text-brand-dark hover:opacity-90 transition-colors duration-150"
                     [attr.aria-label]="'Agregar otro ' + product().name"
                   >
@@ -241,6 +248,7 @@ export class ProductCardComponent {
   private readonly cartService = inject(CartService);
   private readonly dialog = inject(Dialog);
   private readonly notification = inject(NotificationService);
+  readonly storeOpen = inject(StoreStatusService).isOpen;
 
   readonly formatPrice = formatPrice;
   readonly imgError = signal(false);

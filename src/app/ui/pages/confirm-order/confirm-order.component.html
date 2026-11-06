@@ -427,6 +427,9 @@
 
   <!-- Botón de confirmación final -->
   <div class="px-4 pb-8">
+    @if (!storeOpen()) {
+      <div class="mb-3"><app-store-closed-banner /></div>
+    }
     <button
       (click)="confirmOrder()"
       [disabled]="!isFormValid()"
