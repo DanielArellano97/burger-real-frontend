@@ -65,6 +65,13 @@ import {
         </div>
 
         <!-- Fila inferior: botones full-width -->
+        @if (!product().available) {
+          <div class="px-3 pb-3">
+            <div class="flex items-center justify-center h-[44px] rounded-xl font-heading font-semibold text-sm" style="background: #242424; color: #888; border: 1px solid #2A2A2A;">
+              Agotado por hoy
+            </div>
+          </div>
+        } @else {
         <div class="flex gap-2 px-3 pb-3">
           @if (originalQuantity() > 0) {
             <div class="flex items-center justify-between w-[44%] rounded-xl px-3 h-[44px]" style="background: #242424;">
@@ -101,6 +108,7 @@ import {
             Personalizar
           </button>
         </div>
+        }
       </article>
     } @else {
       <!-- LAYOUT ORIGINAL para acompañamientos, bebestibles y extras -->
@@ -158,6 +166,9 @@ import {
                 {{ product().description }}
               </p>
             </div>
+            @if (!product().available) {
+              <div class="flex items-center justify-end mt-2"><span class="inline-flex items-center justify-center px-3 rounded-lg font-heading font-semibold text-sm" style="height: 36px; background: #242424; color: #888; border: 1px solid #2A2A2A;">Agotado</span></div>
+            } @else {
             <div class="flex items-center justify-end mt-2">
               <button
                 (click)="openModal()"
@@ -169,6 +180,7 @@ import {
                 Elegir porción
               </button>
             </div>
+            }
           } @else {
             <!-- DEFAULT LAYOUT (bebestibles, extras) -->
             <div>
@@ -183,7 +195,9 @@ import {
               <span class="font-heading font-bold text-lg text-brand-orange">
                 {{ formatPrice(product().price) }}
               </span>
-              @if (quantity() === 0) {
+              @if (!product().available) {
+                <span class="inline-flex items-center justify-center px-3 rounded-lg font-heading font-semibold text-sm" style="height: 36px; background: #242424; color: #888; border: 1px solid #2A2A2A;">Agotado</span>
+              } @else if (quantity() === 0) {
                 <button
                   (click)="add()"
                   class="flex items-center gap-1 px-3 h-[36px] rounded-lg font-heading font-semibold text-sm transition-all duration-150 hover:opacity-90 active:scale-95"

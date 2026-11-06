@@ -75,7 +75,9 @@
             </div>
             }
           </div>
-          @if (offerActive()) {
+          @if (offerActive() && !bw.available) {
+          <span class="font-heading font-semibold text-sm" style="color: #888; white-space: nowrap;">Agotado</span>
+          } @else if (offerActive()) {
           <button (click)="openBurgerOfTheWeekModal()"
             class="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg font-heading font-semibold text-sm transition-all active:scale-95"
             style="background: #F07800; color: #0F0F0F; white-space: nowrap;"
@@ -115,7 +117,12 @@
             i
           </button>
         </div>
-        @if (getComboQuantity(combo) > 0) {
+        @if (!combo.available) {
+        <div class="w-full mt-2 rounded-lg font-heading font-semibold flex items-center justify-center"
+          style="background: #242424; color: #888; font-size: 14px; height: 36px; border: 1px solid #2A2A2A;">
+          Agotado
+        </div>
+        } @else if (getComboQuantity(combo) > 0) {
         <div class="flex items-center justify-between mt-2 rounded-lg px-1" style="background: #242424; height: 36px;">
           <button (click)="removeComboItem(combo)"
             style="color: #F07800; padding: 4px 6px; font-size: 14px; font-weight: 700;">−</button>
