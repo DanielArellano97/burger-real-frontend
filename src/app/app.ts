@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { NavbarComponent } from './shared/components/navbar/navbar.component';
-import { CartDrawerComponent } from './features/cart/cart-drawer.component';
-import { ToastComponent } from './shared/components/toast/toast.component';
+import { NavbarComponent } from './ui/layout/navbar/navbar.component';
+import { CartDrawerComponent } from './ui/layout/cart-drawer/cart-drawer.component';
+import { ToastComponent } from './ui/layout/toast/toast.component';
 
 @Component({
   selector: 'app-root',
