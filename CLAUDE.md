@@ -1,275 +1,174 @@
 # 🍔 Burger Real — Contexto del Proyecto para Claude
 
-> Última revisión completa contra el código: **2026-11-05** (commit `7708a7e`).
-> Si cambias algo de lo que describe este archivo, actualízalo en el mismo cambio.
+> Revisado contra el código: **2026-11-06**. Si un cambio contradice este archivo,
+> actualízalo en el mismo commit.
 
-## Qué es
+## Qué es y estrategia
 
-Web mobile-first de pedidos para la hamburguesería **Burger Real** (Chile).
-El cliente arma su pedido (burgers personalizables, acompañamientos, bebidas, combos),
-completa sus datos y el pedido se envía como mensaje de **WhatsApp** al local.
-No hay pagos en línea: transferencia (con datos bancarios mostrados) o efectivo.
+Web mobile-first de pedidos para **Burger Real** (Chile). El cliente arma su pedido y lo
+envía como **mensaje de WhatsApp**. Pago por transferencia o efectivo (sin pasarela).
 
-- Repo: `github.com/DanielArellano97/burger-real-frontend`
-- Hosting: **Netlify** (`netlify.toml`), build `pnpm run build` → `dist/burger-real-front/browser`
-
----
-
-## Stack Tecnológico
-
-- **Angular 22** — standalone components, signals, control flow (`@if`, `@for`), rutas lazy
-- **TypeScript 6** — ⚠️ el `tsconfig.json` **no** tiene `"strict": true` ni `strictTemplates`
-- **Tailwind CSS v4** — vía `@tailwindcss/postcss`; tokens de marca en `@theme` de `src/styles.css`
-- **Angular CDK** — `Dialog` (todos los modales), `A11yModule` / `cdkTrapFocus`
-- **@lucide/angular** — iconos como componentes standalone (`LucideX`, `LucidePlus`, …)
-- **pnpm 11.5.2** (`packageManager`), Node 22 (mínimo v22.22.3)
-- Tests: Vitest (`ng test`) — solo existe `app.spec.ts` y está desactualizado (ver Pendientes)
-- Imágenes: **Cloudinary** (`res.cloudinary.com/zas3mkmm/...`)
-
-> No se usa SpartanUI ni Angular Material.
-
-### Backend
-**Hoy no hay backend conectado.** No existe `HttpClient` ni `apiUrl`: todo el catálogo
-(productos, ingredientes, combos, precios) vive en `src/app/core/data/*.data.ts` y los
-servicios lo cargan con un `setTimeout` de 150 ms que simula red.
-Existe un backend previo en **Java 21 / Spring Boot 3.5** (desconectado). Los modelos
-`api-*.model.ts` y los comentarios de mapeo en `ingredients.data.ts` quedan como
-referencia para una futura integración.
+**Estrategia acordada (MVP → backend incremental):**
+1. **Hoy:** frontend estático en Netlify; el menú vive "en duro" en tablas locales.
+2. El front se mantiene **limpio y con forma de base de datos**, para que conectar el
+   backend sea cambiar un adaptador, no reescribir la app.
+3. Cuando los pedidos lo justifiquen, el backend (Java 21 / Spring Boot, **arquitectura
+   hexagonal**) se construye en pasos pequeños:
+   leer catálogo → registrar pedidos → mover cálculos.
+4. El backend antiguo (con sobreingeniería) **no se reutiliza tal cual**: este front es la
+   referencia del modelo de datos.
+5. El diseño visual se considera terminado: **no cambiar estilos** salvo que se pida.
 
 ---
 
-## Paleta de Colores y Tipografía
+## Stack
 
-Definidos en `@theme` (`src/styles.css`) → disponibles como clases Tailwind (`bg-brand-dark`, `text-brand-orange`, `font-display`…).
-
-```css
---color-brand-orange:    #F07800;   /* Naranja principal — CTAs, highlights */
---color-brand-orange-2:  #DC7814;   /* Naranja secundario */
---color-brand-dark:      #0F0F0F;   /* Fondo principal */
---color-brand-surface:   #1A1A1A;   /* Cards y superficies */
---color-brand-surface-2: #242424;   /* Hover */
---color-brand-white:     #F0F0F0;   /* Textos principales */
---color-brand-cream:     #F0DCC8;   /* Textos secundarios */
-```
-Bordes usan `#2A2A2A` inline; textos apagados `#888`.
-
-Tipografías (Google Fonts en `index.html`): `Bebas Neue` (display), `Barlow Condensed` (headings), `Inter` (body).
+- **Angular 22**: standalone, signals, control flow, rutas lazy, `NgOptimizedImage`.
+- **TypeScript 6** con `strict` + `strictTemplates`.
+- **Tailwind CSS v4** (`@tailwindcss/postcss`); tokens en `@theme` de `src/styles.css`.
+- **Angular CDK**: `Dialog` y `A11yModule`. **@lucide/angular** para íconos.
+- **Cloudinary** para imágenes (loader propio). **Vitest** vía `ng test`.
+- **pnpm 11.5.2**, Node 22.22.3+. Hosting **Netlify** (`netlify.toml`).
+- No se usa: SpartanUI, Angular Material, `@angular/animations` (animaciones en CSS),
+  Reactive Forms, `HttpClient` (aún).
 
 ---
 
-## Arquitectura del Proyecto
+## Arquitectura hexagonal (`src/app`)
 
 ```
-src/
-  environments/environment.ts      ← WhatsApp, nombre del local, datos bancarios
-  app/
-    app.config.ts                  ← Router (preload selectivo, input binding), animaciones async, DialogModule
-    app.routes.ts                  ← '' (home), 'menu', 'confirmar-pedido' (guard), '**' → ''
-    core/
-      config/
-        delivery.config.ts         ← Coordenada del local, radio máx., factor ruta, tramos de precio
-      data/                        ← FUENTE DE VERDAD ACTUAL DEL CATÁLOGO
-        ingredients.data.ts        ← Catálogo maestro de ingredientes (precios de extra, control)
-        menu.data.ts               ← Productos en formato receta → MENU_DATA + CATEGORIES
-        combos.data.ts             ← Combos; precio calculado desde componentes → COMBOS_DATA
-      guards/cart.guard.ts         ← Bloquea /confirmar-pedido con carrito vacío → /menu
-      models/
-        product.model.ts           ← Product, Ingredient, IngredientMaster, RecipeLine, SizeVariant, IncludedProduct
-        combo.model.ts             ← Combo, ComboDetalle
-        cart-item.model.ts         ← CartItem (combo, variantes, promo)
-        api-product.model.ts       ← (sin uso) contrato del backend antiguo
-        api-combo.model.ts         ← (sin uso) contrato del backend antiguo
-      services/
-        cart.service.ts            ← Estado del carrito (signals) + persistencia localStorage
-        producto.service.ts        ← Expone MENU_DATA y extrasCatalog
-        combo.service.ts           ← Expone COMBOS_DATA
-        notification.service.ts    ← Toast "modo ametralladora"
-        whatsapp.service.ts        ← Arma el mensaje y abre wa.me (con fallback si hay popup bloqueado)
-      strategies/selective-preload.strategy.ts ← menu a los 500 ms, confirmar-pedido a los 3 s
-      utils/
-        burger-of-the-week.ts      ← Rotación diaria de la promo (lunes–jueves)
-        combo-pricing.ts           ← Precio de cada línea del combo y total
-        combo-format.ts            ← Formato común de líneas de combo (modal, carrito, WhatsApp)
-        delivery.ts                ← Haversine, cálculo de tramo, link Google Maps
-        price.utils.ts             ← (sin uso) calculateUnitPrice
-    features/
-      home/                        ← Landing: hero, beneficios, accesos por categoría (?cat=)
-      menu/                        ← Burger de la semana, carrusel de combos, tabs por categoría
-      cart/cart-drawer.component.ts← Drawer global del carrito (editar, cantidades, vaciar)
-      confirm-order/               ← Checkout: datos, retiro/delivery + GPS, pago, envío WhatsApp
-    shared/components/
-      navbar/  toast/  product-card/
-      ingredient-modal/            ← Personalización de burgers y porción+extras de acompañamientos
-      combo-modal/                 ← Selección de bebida (paso a paso) dentro de un combo
-      combo-detail-modal/          ← Detalle informativo del combo
-      burger-of-the-week-modal/    ← Confirmación de la promo
-      image-lightbox/              ← Visor ampliado de imágenes (openImageLightbox)
-      drink-selector-modal/        ← Hoy sin uso real (ningún producto pasa por esa rama)
+domain/          TS puro, sin Angular. Modelos, reglas y PUERTOS.
+  catalog/       catalog.models · pricing · combo-format · catalog.repository (puerto)
+  cart/          cart.models (StoredCartLine / CartItem) · cart-lines · cart.storage (puerto)
+  order/         order.models · order-message (texto WhatsApp) · order.sender (puerto)
+  promo/         burger-of-the-week          delivery/  delivery (Haversine, tramos)
+  schedule/      business-hours              shared/    money (formatPrice)
+application/     Servicios Angular: CatalogService, CartService, OrderService,
+                 ClockService, StoreStatusService, NotificationService
+infrastructure/  Adaptadores
+  catalog/       catalog.records (contrato BD/API, en español) · catalog.mapper
+    local/       LocalCatalogRepository + tables/*.table.ts  ← EL MENÚ
+  storage/       LocalCartStorage (localStorage, clave burger-real-cart-v2)
+  whatsapp/      WhatsappOrderSender (wa.me + fallback si se bloquea el popup)
+  images/        cloudinary-image.loader (IMAGE_LOADER + cloudinaryUrl)
+config/          business-hours.config · delivery.config (editables)
+routing/         cart.guard · selective-preload.strategy
+ui/              pages/ (home, menu, confirm-order) · layout/ (navbar, cart-drawer, toast)
+                 components/ (modales, product-card, image-lightbox, store-closed-banner)
+                 shared/categories.ts
+testing/         catalog.fixture (catálogo real para tests)
 ```
 
----
+**Reglas de dependencias:**
+- `domain` no importa nada de Angular ni de otras capas.
+- `ui` usa `application` (y funciones puras de `domain`). **Nunca** importa las tablas
+  ni `catalog.records`.
+- Solo `LocalCatalogRepository` lee las tablas. Todo lo demás pide el catálogo a
+  `CatalogService`.
+- `app.config.ts` une cada puerto con su adaptador. El catálogo se carga con
+  `provideAppInitializer` antes de mostrar la app.
+- **Nomenclatura:** código en inglés. Registros de BD (`*Record`, tablas) en español,
+  como en el backend. Textos de UI en español.
 
-## Datos del Catálogo (cómo se arman)
-
-1. **`ingredients.data.ts`** — `IngredientMaster[]`: `extraPrice`, `canBeExtra`, `control` (`counter` 0..5 | `toggle` sí/no), `hidden`, `extraCategories` (dónde se ofrece como extra).
-2. **`menu.data.ts`** — productos con `recipe: RecipeLine[]` (ids del catálogo maestro). `buildIngredients()` lo expande a `Ingredient[]` y **lanza error** si un id no existe.
-   - Burgers (ids 1–10), acompañamientos (11 papas, 12 aritos, 13 deditos), bebestibles (21–25).
-   - Todas las burgers `incluye` papas 100g (variante interna `504`, `internal: true`).
-   - Burgers con `precioOferta` (candidatas a burger de la semana): 1, 3, 4, 9, 10.
-3. **`combos.data.ts`** — `COMBOS_CONFIG` sin precio; `construirDetalles()` agrega las papas incluidas (a $0, `incluidoEnProducto`) y `calcularPrecioCombo()` fija `price`.
-   - "Bebida a elección" = `productoId: 0` + `precioComboUnitario` + `opcionesDisponibles` generadas desde los bebestibles.
-
----
-
-## Reglas de Negocio
-
-> Mientras no haya backend, las reglas viven en `core/data`, `core/config` y `core/utils`.
-> **Nunca hardcodear precios ni reglas dentro de componentes**: siempre en esos archivos.
-
-### Ingredientes / personalización
-- `isRequired: true` → no se puede bajar de la cantidad base (Pan, Medallón).
-- `hidden: true` → está en la receta pero no se muestra en el modal (Pan Brioche).
-- Extras disponibles = `extrasCatalog` (`canBeExtra`) filtrado por `extraCategories`; ej. Pepinillos (toggle, $0) solo en hamburguesas.
-- `allowExtras: false` (aritos, deditos) → sin sección de extras.
-- Bajar un ingrediente a 0 → **no** descuenta el precio base.
-- Subir sobre `defaultQuantity` → suma `extraPrice` por unidad excedente.
-
-### Acompañamientos
-- Se agregan siempre vía `IngredientModal` (elección de porción + extras si aplica).
-- Precio = `variant.extraPrice` si es > 0 (precio completo de esa porción), si no `product.price`. Ojo: en acompañamientos `extraPrice` significa **precio de la porción**, no un adicional.
-- Variantes `internal: true` nunca se ofrecen al cliente.
-
-### Combos
-- Precio = suma de componentes usando `comboPrice` (producto o variante). La burger usa su precio normal (nunca `precioOferta`). Papas incluidas = $0.
-- En carrito: un solo ítem `isCombo: true` (id de producto `combo.id + 90000`); nunca descomponer.
-- Bebidas múltiples → `ComboModal` abierto en secuencia (uno por unidad), con botón "volver"; resultado en `selectedVariants[]`.
-
-### Burger de la semana (promo diaria)
-- Se resuelve en el front (`burgerDelDia`): rota **un día a la vez** entre burgers con `precioOferta`, en orden del menú. Lunes ancla: 2026-01-05.
-- Solo **lunes a jueves** (`esDiaDeOferta`) se muestra el precio de oferta y botón Agregar; viernes–domingo se muestra la próxima burger con aviso "Lunes a Jueves".
-- La línea del carrito lleva `isPromo` + `promoDate`; se separa de la burger de carta, no es personalizable y se descarta al reabrir otro día.
-- En desarrollo se puede simular la fecha: `/menu?fecha=2026-10-26`.
-
-### Carrito
-- Persistido en `localStorage` (`burger-real-cart`).
-- Misma burger con distinta personalización / distinta variante / promo vs carta → ítems separados.
-
-### Checkout y delivery
-- Nombre (solo letras, ≤80) y teléfono con prefijo fijo `+569` + 8 dígitos (se formatea al escribir).
-- Formulario guardado en `sessionStorage` (`burger-real-checkout-form`).
-- **Retiro** (sin costo) o **Delivery**:
-  - Con GPS: distancia Haversine × `factorRuta` (1.25), redondeada hacia arriba a 0,1 km → tramo de `DELIVERY_CONFIG.tramos` (hasta 10 km). Fuera de cobertura bloquea el envío.
-  - Sin GPS: dirección escrita obligatoria y delivery "por confirmar" (el total se muestra como provisional).
-  - GPS: alta precisión y reintento en modo normal; mensajes guiados para iPhone.
-- Pago: transferencia (copia datos bancarios) o efectivo (monto ≥ total, calcula vuelto).
-- Envío: `window.open(wa.me)`; si el navegador bloquea el popup, se muestra enlace de respaldo y **no** se vacía el carrito. Al enviar: limpia carrito y formulario y vuelve a `/menu`.
-- Notas del cliente se aplanan a una sola línea en el mensaje (evita inyectar secciones falsas).
+### Conectar el backend (cuando toque)
+Crear `HttpCatalogRepository extends CatalogRepository` que haga
+`http.get<CatalogRecords>()` y llame a `mapCatalog()`. Registrar `provideHttpClient()`,
+cambiar el provider en `app.config.ts` y **agregar el dominio a `connect-src` de la CSP**
+en `netlify.toml`.
 
 ---
 
-## Convenciones de Código
+## Modelo de datos (tablas en `infrastructure/catalog/local/tables/`)
 
-### Signals (obligatorio)
-Signals / `computed` / `effect` para todo el estado. **Sin Reactive Forms, sin `ngModel`, sin `BehaviorSubject`.**
-Los inputs se manejan con `(input)` + `signal.set(...)`. RxJS solo donde lo exige Angular (router, preloading, `fromEvent`, `dialogRef.closed`).
+| Tabla | Notas |
+|---|---|
+| `productos` | `categoria` HAMBURGUESA/ACOMPANAMIENTO/BEBESTIBLE · `precio` = porción base · `precioOferta` (promo) · `precioCombo` · `disponible` · `imagen` (id público Cloudinary) · `nombreCorto` (selector de bebidas) |
+| `porciones` | **precio final = `productos.precio` + `precioAdicional`** · `precioCombo` absoluto · `interna` (nunca se ofrece, ej. papas 100g) |
+| `ingredientes` | `precioExtra` · `permiteExtra` · `tipoControl` CONTADOR/SI_NO · `oculto` · `categoriasExtra` |
+| `producto_ingredientes` | receta: `cantidad`, `obligatorio` |
+| `producto_incluye` | lo que trae un producto (papas 100g de cada burger) |
+| `combos` | sin precio: se calcula · `disponible` |
+| `combo_detalles` | `productoId` fijo, o `null` + `categoriaSeleccion` + `precioUnitario` (bebida a elección) |
 
-### Componentes
-- Standalone, inyección con `inject()` (los `constructor()` existentes son solo para `effect`).
-- `@for` con `track` por id; `track $index` solo para arrays de strings.
-  (Excepción actual a corregir: `combo-detail-modal` y `combo-modal` usan `track $index` sobre objetos.)
-- `ChangeDetectionStrategy.OnPush` en componentes nuevos (ya lo usa `MenuComponent`).
-
-### Modales (CDK Dialog)
-Siempre `@angular/cdk/dialog`, nunca Material.
-
-```ts
-const ref = this.dialog.open<ResultType, DataType>(ComponentModal, {
-  data: { ... },
-  backdropClass: 'burger-dialog-backdrop',
-  panelClass: 'burger-modal-pane',
-  width: '420px',          // 380px para selectores simples
-  maxWidth: '95vw',
-  autoFocus: 'first-tabbable',
-});
-```
-
-### Estilos
-- Tailwind v4 para layout/spacing; valores exactos de marca pueden ir inline (`style=""`).
-- **Sin fondos blancos** — solo oscuros y naranja.
-- Mobile-first; `md:` / `lg:` solo para adaptar a desktop.
-- Inputs con `font-size: 16px` en móvil (evita zoom de iOS; regla global en `styles.css`).
-- Respetar `prefers-reduced-motion` (regla global ya existente).
-
-### Imágenes
-- URLs de Cloudinary con `w_600,f_auto,q_auto` en el catálogo; el hero semanal aplica `c_fill,g_auto,w_800,h_500` automáticamente.
-- Si no hay `imageUrl`, la tarjeta muestra un ícono; la burger de la semana usa un fallback de Unsplash.
-
-### Commits
-Formato convencional en español: `feat(ámbito): descripción`, `fix(ámbito): descripción`.
+`catalog.mapper` falla al arrancar si hay ids inexistentes (mejor que un menú incompleto).
 
 ---
 
-## Seguridad / Netlify
-- `netlify.toml` define redirect SPA, caché (HTML sin caché, JS/CSS inmutables) y cabeceras de seguridad con **CSP**.
-- CSP actual: `img-src` permite Unsplash y Cloudinary; `connect-src 'self'`.
-  ➜ **Si se conecta un backend o se agrega un dominio de imágenes/fuentes, hay que actualizar la CSP** o el navegador lo bloqueará en producción.
-- `public/_redirects` duplica el redirect SPA (redundante con `netlify.toml`).
-- `environment.ts` contiene número de WhatsApp real y datos bancarios (se muestran al cliente). No hay `environment.prod.ts` ni `fileReplacements`.
+## Reglas de negocio
+
+> Mientras no haya backend viven en `domain/` y `config/`. **Nunca en componentes.**
+
+- **Personalización:** quitar no descuenta; cada unidad sobre la receta suma
+  `extraPrice`; máximo 5 por ingrediente; los obligatorios no bajan de la base; los
+  ocultos (pan) no se muestran.
+- **Extras:** catálogo maestro filtrado por `categories` y `allowsExtras`
+  (Pepinillos: sí/no, gratis, solo burgers).
+- **Porciones:** base + adicional. La UI muestra el **precio final** de cada porción.
+- **Combos:** precio = Σ `unitPrice × quantity`. La burger usa su precio normal (nunca la
+  oferta), las papas incluidas valen $0 y la porción usa `comboPrice`. Las elecciones
+  se hacen paso a paso.
+  Un combo queda agotado si falta un componente fijo o no quedan opciones.
+- **Burger de la semana:** rota a diario entre burgers con `offerPrice`, solo de lunes a
+  jueves (fin de semana muestra la del próximo lunes). Ancla: 2026-01-05. Es una línea
+  `promoDate` aparte, no personalizable y vence al cambiar el día.
+- **Carrito:** guarda **solo referencias** (`StoredCartLine`: ids, porción, cantidades
+  que difieren de la receta, elecciones, `promoDate`). `items` se reconstruye desde el
+  catálogo vigente: precios siempre actuales y se descarta lo inválido o agotado.
+  Las líneas iguales se unen.
+- **Horario:** 18:00–22:00, `America/Santiago`, todos los días. Fuera de horario el menú
+  se ve, pero se desactiva agregar (UI + `CartService`) y enviar.
+- **Delivery:** Haversine × 1.25, redondeo hacia arriba a 0,1 km, tramos hasta 10 km.
+  Sin GPS: dirección obligatoria y delivery "por confirmar".
+- **Checkout:** nombre (letras, ≤80), teléfono `+569` + 8 dígitos. Efectivo ≥ total.
+  El formulario se guarda en `sessionStorage`. Si el popup se bloquea → enlace de
+  respaldo y el carrito no se vacía.
+- **Mensaje:** textos libres aplanados a una línea (anti-inyección). La promo se marca
+  "(Burger de la semana)".
+- **Desarrollo:** `?fecha=YYYY-MM-DD&hora=HH:mm` simula el reloj (solo con `isDevMode`).
 
 ---
 
-## Estado Actual del Proyecto
+## Convenciones de código
 
-### ✅ Completado
-- Home, menú con tabs por categoría (scroll-spy) y acceso directo `?cat=`
-- Catálogo maestro de ingredientes + recetas + combos con precio calculado
-- Personalización de burgers (contador y toggle, extras por categoría)
-- Porciones de acompañamientos
-- Combos con selección de bebidas paso a paso y modal informativo
-- Burger de la semana con rotación diaria lunes–jueves
-- Carrito drawer: editar personalización, cantidades, vaciar con confirmación, persistencia
-- Toast "modo ametralladora"
-- Checkout con validaciones, delivery por distancia con GPS, efectivo con vuelto, transferencia
-- Mensaje de WhatsApp detallado + fallback de popup bloqueado
-- Imágenes reales en Cloudinary + visor ampliado (lightbox)
-- Deploy en Netlify con cabeceras de seguridad
-- Guard de `/confirmar-pedido` y redirección si el carrito queda vacío
-
-### 🔄 Pendiente / deuda técnica
-- Definir integración con backend (catálogo, registrar la venta al enviar el pedido) — requiere actualizar CSP
-- Activar `"strict": true` y `strictTemplates` en TypeScript
-- Arreglar o reescribir `app.spec.ts` (espera un `h1` "Hello, burger-real-front" que no existe)
-- Limpiar código sin uso: `api-*.model.ts` (o reutilizarlos al conectar backend), `price.utils.ts`, rama de variantes de `ProductCardComponent.add()` + `drink-selector-modal`
-- Cambiar `track $index` sobre objetos en `combo-detail-modal` y `combo-modal`
-- Vista desktop (hoy mobile-first)
-- Bundle inicial ~467 kB (budget de warning: 500 kB) — vigilar al agregar dependencias
+- Signals / `computed` / `effect` para el estado. Inputs con `(input)` + `signal.set`.
+  RxJS solo donde Angular lo exige.
+- Standalone, `inject()`, `readonly` en lo que no se reasigna. `OnPush` en componentes
+  nuevos.
+- `@for` con `track` por id. `track $index` solo cuando los elementos se repiten
+  (ej. bebidas elegidas) o son strings.
+- Modales con `@angular/cdk/dialog`: `backdropClass: 'burger-dialog-backdrop'`,
+  `panelClass: 'burger-modal-pane'`, `maxWidth: '95vw'`, `autoFocus: 'first-tabbable'`.
+- Imágenes de productos con `ngSrc` + `width/height` + `loaderParams.aspectRatio`. Hero
+  con `priority`. En modo dev la directiva valida la configuración; no ignorar sus avisos.
+- Estilos: Tailwind para layout; colores de marca inline cuando son exactos; sin fondos
+  blancos; mobile-first; inputs a 16px en móvil (evita zoom iOS).
+- Precios: siempre `formatPrice()` de `domain/shared/money`.
 
 ---
 
-## Flujo Principal del Usuario
+## Flujo de trabajo con Claude
 
-```
-Home → Menú → [Agregar / Personalizar / Combo / Promo] → Carrito (drawer) → /confirmar-pedido → WhatsApp
-```
-
-### Burger
-1. `"+ Agregar"` → receta original directa (`addOriginal`).
-2. `"Personalizar"` → `IngredientModalComponent` → `CartService.addItem()` con snapshot de ingredientes.
-
-### Combo
-1. Ícono ℹ️ → `ComboDetailModalComponent` (informativo).
-2. `"Agregar"` → por cada unidad de detalles con `requiereSeleccion` abre `ComboModalComponent` en secuencia.
-3. Al terminar → `CartService.addCombo(combo, selectedVariants)`.
-
-### Burger de la semana
-`BurgerOfTheWeekModalComponent` confirma → `addItem(..., isPromo=true, promoDate)` con `precioOferta`.
+- **Explicar en detalle** cada cambio: qué, dónde y por qué (el usuario quiere entender,
+  no solo copiar).
+- Cambios **quirúrgicos**: no tocar lo que no se pidió. Todo debe seguir funcionando
+  igual que antes.
+- **Un commit por punto/tarea**, en español:
+  `tipo(ámbito): resumen` + cuerpo con el detalle
+  (`feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `build`, `style`, `security`, `chore`).
+- Antes de terminar: `pnpm build` (sin errores ni warnings) y `pnpm test:ci`.
+- Si se cambian precios o tablas: comparar el catálogo antes y después.
+- El repo usa **CRLF** en Windows (`core.autocrlf`); no convertir finales de línea.
+- Checklist manual antes de publicar: `docs/CHECKLIST-PRUEBAS.md`.
 
 ---
 
-## Notas para Claude
+## Pendientes
 
-- **Verificar compilación al terminar**: `pnpm build` (o `ng build`). Debe compilar sin errores ni warnings.
-- Cambios **quirúrgicos**: no tocar nada que no esté mencionado en el pedido.
-- El usuario quiere explicaciones detalladas de cada cambio (qué, dónde y por qué), no solo el código.
-- Para cambiar precios, productos o tramos de delivery: editar `core/data/*` o `core/config/delivery.config.ts`, no los componentes.
-- Mantener este archivo actualizado cuando cambie la arquitectura, reglas o pendientes.
+- [ ] Confirmar en producción las URLs de Cloudinary con `c_fill,g_auto,ar_*` (fotos
+      recortadas bien) y la vista previa al compartir el link.
+- [ ] Cuando exista dominio propio, agregar `og:url` y `<link rel="canonical">`.
+- [ ] Backend: lectura del catálogo (`HttpCatalogRepository`).
+- [ ] Backend: registrar pedidos al enviarlos.
+- [ ] Vista desktop.
+- [ ] Identificadores en español que quedan dentro de `confirm-order.component.ts`
+      (`deliveryPendiente`, `mapaUrl`…): renombrar cuando se toque ese componente.
