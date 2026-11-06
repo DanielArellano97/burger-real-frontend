@@ -10,7 +10,6 @@ import {
   IngredientModalData,
   IngredientModalResult,
 } from '../ingredient-modal/ingredient-modal.component';
-import { DrinkSelectorModalComponent, DrinkSelectorModalData, DrinkSelectorModalResult } from '../drink-selector-modal/drink-selector-modal.component';
 
 @Component({
   selector: 'app-product-card',
@@ -292,37 +291,11 @@ export class ProductCardComponent {
     });
   }
 
+  /** Bebestibles: se agregan directo, no tienen porciones ni personalización. */
   add(): void {
     const product = this.product();
-    const variants = (product.variants ?? []).filter(v => !v.internal);
-
-    if (variants.length === 0) {
-      this.cartService.addItem(product, [], product.price);
-      this.notification.show(product.name);
-      return;
-    }
-
-    const ref = this.dialog.open<DrinkSelectorModalResult, DrinkSelectorModalData>(
-      DrinkSelectorModalComponent,
-      {
-        data: {
-          productName: product.name,
-          opciones: variants,
-        },
-        backdropClass: 'burger-dialog-backdrop',
-        panelClass: 'burger-modal-pane',
-        width: '380px',
-        maxWidth: '95vw',
-        autoFocus: 'first-tabbable',
-      }
-    );
-
-    ref.closed.subscribe(result => {
-      if (result) {
-        this.cartService.addItem(product, [], product.price, result.selectedVariant);
-        this.notification.show(product.name);
-      }
-    });
+    this.cartService.addItem(product, [], product.price);
+    this.notification.show(product.name);
   }
 
   increase(): void {
