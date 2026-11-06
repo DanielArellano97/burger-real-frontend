@@ -1,34 +1,59 @@
-# 🍔 Burger Real — Contexto del Proyecto para Claude Code
+# 🍔 Burger Real — Contexto del Proyecto para Claude
 
-## Stack Tecnológico
+> Última revisión completa contra el código: **2026-11-05** (commit `7708a7e`).
+> Si cambias algo de lo que describe este archivo, actualízalo en el mismo cambio.
 
-### Frontend
-- **Angular 22** — standalone components, signals para estado reactivo
-- **Tailwind CSS v4** — con variables de marca definidas en `styles.css`
-- **SpartanUI** — componentes headless/accesibles
-- **Angular CDK** — `Dialog`, `CdkTrapFocus`, `A11yModule`
-- **Lucide Angular** — iconografía
-- **TypeScript** estricto
+## Qué es
 
-### Backend
-- **Java 21** con **Spring Boot 3.5**
-- API REST en `http://localhost:8080`
-- Sin autenticación por ahora
+Web mobile-first de pedidos para la hamburguesería **Burger Real** (Chile).
+El cliente arma su pedido (burgers personalizables, acompañamientos, bebidas, combos),
+completa sus datos y el pedido se envía como mensaje de **WhatsApp** al local.
+No hay pagos en línea: transferencia (con datos bancarios mostrados) o efectivo.
+
+- Repo: `github.com/DanielArellano97/burger-real-frontend`
+- Hosting: **Netlify** (`netlify.toml`), build `pnpm run build` → `dist/burger-real-front/browser`
 
 ---
 
-## Paleta de Colores de Marca
+## Stack Tecnológico
+
+- **Angular 22** — standalone components, signals, control flow (`@if`, `@for`), rutas lazy
+- **TypeScript 6** — ⚠️ el `tsconfig.json` **no** tiene `"strict": true` ni `strictTemplates`
+- **Tailwind CSS v4** — vía `@tailwindcss/postcss`; tokens de marca en `@theme` de `src/styles.css`
+- **Angular CDK** — `Dialog` (todos los modales), `A11yModule` / `cdkTrapFocus`
+- **@lucide/angular** — iconos como componentes standalone (`LucideX`, `LucidePlus`, …)
+- **pnpm 11.5.2** (`packageManager`), Node 22 (mínimo v22.22.3)
+- Tests: Vitest (`ng test`) — solo existe `app.spec.ts` y está desactualizado (ver Pendientes)
+- Imágenes: **Cloudinary** (`res.cloudinary.com/zas3mkmm/...`)
+
+> No se usa SpartanUI ni Angular Material.
+
+### Backend
+**Hoy no hay backend conectado.** No existe `HttpClient` ni `apiUrl`: todo el catálogo
+(productos, ingredientes, combos, precios) vive en `src/app/core/data/*.data.ts` y los
+servicios lo cargan con un `setTimeout` de 150 ms que simula red.
+Existe un backend previo en **Java 21 / Spring Boot 3.5** (desconectado). Los modelos
+`api-*.model.ts` y los comentarios de mapeo en `ingredients.data.ts` quedan como
+referencia para una futura integración.
+
+---
+
+## Paleta de Colores y Tipografía
+
+Definidos en `@theme` (`src/styles.css`) → disponibles como clases Tailwind (`bg-brand-dark`, `text-brand-orange`, `font-display`…).
 
 ```css
 --color-brand-orange:    #F07800;   /* Naranja principal — CTAs, highlights */
+--color-brand-orange-2:  #DC7814;   /* Naranja secundario */
 --color-brand-dark:      #0F0F0F;   /* Fondo principal */
 --color-brand-surface:   #1A1A1A;   /* Cards y superficies */
---color-brand-surface-2: #242424;   /* Hover, bordes */
+--color-brand-surface-2: #242424;   /* Hover */
 --color-brand-white:     #F0F0F0;   /* Textos principales */
 --color-brand-cream:     #F0DCC8;   /* Textos secundarios */
 ```
+Bordes usan `#2A2A2A` inline; textos apagados `#888`.
 
-Tipografías: `Bebas Neue` (display), `Barlow Condensed` (headings), `Inter` (body)
+Tipografías (Google Fonts en `index.html`): `Bebas Neue` (display), `Barlow Condensed` (headings), `Inter` (body).
 
 ---
 
@@ -36,199 +61,215 @@ Tipografías: `Bebas Neue` (display), `Barlow Condensed` (headings), `Inter` (bo
 
 ```
 src/
+  environments/environment.ts      ← WhatsApp, nombre del local, datos bancarios
   app/
+    app.config.ts                  ← Router (preload selectivo, input binding), animaciones async, DialogModule
+    app.routes.ts                  ← '' (home), 'menu', 'confirmar-pedido' (guard), '**' → ''
     core/
-      services/
-        cart.service.ts          ← Estado global del carrito (signals)
-        combo.service.ts         ← Carga combos desde el backend
-        notification.service.ts  ← Sistema de toast notifications
-        producto.service.ts      ← Carga productos desde el backend
-        whatsapp.service.ts      ← Construcción del mensaje y envío
+      config/
+        delivery.config.ts         ← Coordenada del local, radio máx., factor ruta, tramos de precio
+      data/                        ← FUENTE DE VERDAD ACTUAL DEL CATÁLOGO
+        ingredients.data.ts        ← Catálogo maestro de ingredientes (precios de extra, control)
+        menu.data.ts               ← Productos en formato receta → MENU_DATA + CATEGORIES
+        combos.data.ts             ← Combos; precio calculado desde componentes → COMBOS_DATA
+      guards/cart.guard.ts         ← Bloquea /confirmar-pedido con carrito vacío → /menu
       models/
-        api-combo.model.ts       ← Interfaces del backend para combos
-        api-product.model.ts     ← Interfaces del backend para productos
-        cart-item.model.ts       ← CartItem con soporte combo y variantes
-        combo.model.ts           ← Modelo interno de combos
-        product.model.ts         ← Modelo interno de productos
-      guards/
-        cart.guard.ts            ← Protege /confirmar-pedido si carrito vacío
-      strategies/
-        selective-preload.strategy.ts  ← Preloading estratégico de rutas
-      data/
-        menu.data.ts             ← Solo datos locales residuales (limpiar en refactor)
+        product.model.ts           ← Product, Ingredient, IngredientMaster, RecipeLine, SizeVariant, IncludedProduct
+        combo.model.ts             ← Combo, ComboDetalle
+        cart-item.model.ts         ← CartItem (combo, variantes, promo)
+        api-product.model.ts       ← (sin uso) contrato del backend antiguo
+        api-combo.model.ts         ← (sin uso) contrato del backend antiguo
+      services/
+        cart.service.ts            ← Estado del carrito (signals) + persistencia localStorage
+        producto.service.ts        ← Expone MENU_DATA y extrasCatalog
+        combo.service.ts           ← Expone COMBOS_DATA
+        notification.service.ts    ← Toast "modo ametralladora"
+        whatsapp.service.ts        ← Arma el mensaje y abre wa.me (con fallback si hay popup bloqueado)
+      strategies/selective-preload.strategy.ts ← menu a los 500 ms, confirmar-pedido a los 3 s
+      utils/
+        burger-of-the-week.ts      ← Rotación diaria de la promo (lunes–jueves)
+        combo-pricing.ts           ← Precio de cada línea del combo y total
+        combo-format.ts            ← Formato común de líneas de combo (modal, carrito, WhatsApp)
+        delivery.ts                ← Haversine, cálculo de tramo, link Google Maps
+        price.utils.ts             ← (sin uso) calculateUnitPrice
     features/
-      home/
-      menu/
-      confirm-order/
-    shared/
-      components/
-        burger-of-the-week-modal/
-        cart-drawer/
-        combo-detail-modal/
-        combo-modal/
-        drink-selector-modal/
-        ingredient-modal/
-        navbar/
-        product-card/
-        toast/
+      home/                        ← Landing: hero, beneficios, accesos por categoría (?cat=)
+      menu/                        ← Burger de la semana, carrusel de combos, tabs por categoría
+      cart/cart-drawer.component.ts← Drawer global del carrito (editar, cantidades, vaciar)
+      confirm-order/               ← Checkout: datos, retiro/delivery + GPS, pago, envío WhatsApp
+    shared/components/
+      navbar/  toast/  product-card/
+      ingredient-modal/            ← Personalización de burgers y porción+extras de acompañamientos
+      combo-modal/                 ← Selección de bebida (paso a paso) dentro de un combo
+      combo-detail-modal/          ← Detalle informativo del combo
+      burger-of-the-week-modal/    ← Confirmación de la promo
+      image-lightbox/              ← Visor ampliado de imágenes (openImageLightbox)
+      drink-selector-modal/        ← Hoy sin uso real (ningún producto pasa por esa rama)
 ```
 
 ---
 
-## Endpoints del Backend
+## Datos del Catálogo (cómo se arman)
 
-| Método | URL | Descripción |
-|--------|-----|-------------|
-| GET | `/api/productos` | Todos los productos (ordenados por id ASC) |
-| GET | `/api/v1/combos` | Todos los combos disponibles |
-
-**Nota:** El backend filtra automáticamente — los viernes, sábados y domingos manda `precioOferta: null` en todas las hamburguesas (lógica de burger de la semana).
+1. **`ingredients.data.ts`** — `IngredientMaster[]`: `extraPrice`, `canBeExtra`, `control` (`counter` 0..5 | `toggle` sí/no), `hidden`, `extraCategories` (dónde se ofrece como extra).
+2. **`menu.data.ts`** — productos con `recipe: RecipeLine[]` (ids del catálogo maestro). `buildIngredients()` lo expande a `Ingredient[]` y **lanza error** si un id no existe.
+   - Burgers (ids 1–10), acompañamientos (11 papas, 12 aritos, 13 deditos), bebestibles (21–25).
+   - Todas las burgers `incluye` papas 100g (variante interna `504`, `internal: true`).
+   - Burgers con `precioOferta` (candidatas a burger de la semana): 1, 3, 4, 9, 10.
+3. **`combos.data.ts`** — `COMBOS_CONFIG` sin precio; `construirDetalles()` agrega las papas incluidas (a $0, `incluidoEnProducto`) y `calcularPrecioCombo()` fija `price`.
+   - "Bebida a elección" = `productoId: 0` + `precioComboUnitario` + `opcionesDisponibles` generadas desde los bebestibles.
 
 ---
 
-## Reglas de Negocio Importantes
+## Reglas de Negocio
 
-### ⚠️ Regla fundamental
-**Nunca implementar lógica de negocio en el frontend.** Todo lo que sea una regla del negocio (precios, disponibilidad, descuentos, flags de personalización) debe venir del backend. El frontend solo mapea y renderiza.
+> Mientras no haya backend, las reglas viven en `core/data`, `core/config` y `core/utils`.
+> **Nunca hardcodear precios ni reglas dentro de componentes**: siempre en esos archivos.
 
-### Ingredientes
-- `permiteQuitar: false` + `permiteAgregar: false` → NO aparece en el modal de personalización (ej: Pan Brioche, Papas Fritas)
-- `permiteQuitar: false` + `permiteAgregar: true` → Aparece en modal, botón `−` bloqueado en cantidad base (ej: Medallón de Carne)
-- `permiteQuitar: true` + `permiteAgregar: true` → Aparece en modal, ambos botones habilitados
-- `isRequired: true` en el modelo interno = `permiteQuitar: false` del backend
+### Ingredientes / personalización
+- `isRequired: true` → no se puede bajar de la cantidad base (Pan, Medallón).
+- `hidden: true` → está en la receta pero no se muestra en el modal (Pan Brioche).
+- Extras disponibles = `extrasCatalog` (`canBeExtra`) filtrado por `extraCategories`; ej. Pepinillos (toggle, $0) solo en hamburguesas.
+- `allowExtras: false` (aritos, deditos) → sin sección de extras.
+- Bajar un ingrediente a 0 → **no** descuenta el precio base.
+- Subir sobre `defaultQuantity` → suma `extraPrice` por unidad excedente.
+
+### Acompañamientos
+- Se agregan siempre vía `IngredientModal` (elección de porción + extras si aplica).
+- Precio = `variant.extraPrice` si es > 0 (precio completo de esa porción), si no `product.price`. Ojo: en acompañamientos `extraPrice` significa **precio de la porción**, no un adicional.
+- Variantes `internal: true` nunca se ofrecen al cliente.
+
+### Combos
+- Precio = suma de componentes usando `comboPrice` (producto o variante). La burger usa su precio normal (nunca `precioOferta`). Papas incluidas = $0.
+- En carrito: un solo ítem `isCombo: true` (id de producto `combo.id + 90000`); nunca descomponer.
+- Bebidas múltiples → `ComboModal` abierto en secuencia (uno por unidad), con botón "volver"; resultado en `selectedVariants[]`.
+
+### Burger de la semana (promo diaria)
+- Se resuelve en el front (`burgerDelDia`): rota **un día a la vez** entre burgers con `precioOferta`, en orden del menú. Lunes ancla: 2026-01-05.
+- Solo **lunes a jueves** (`esDiaDeOferta`) se muestra el precio de oferta y botón Agregar; viernes–domingo se muestra la próxima burger con aviso "Lunes a Jueves".
+- La línea del carrito lleva `isPromo` + `promoDate`; se separa de la burger de carta, no es personalizable y se descarta al reabrir otro día.
+- En desarrollo se puede simular la fecha: `/menu?fecha=2026-10-26`.
 
 ### Carrito
-- Dos burgers con distinta personalización → ítems separados (comparación por `cartItemId`)
-- Dos acompañamientos con distinta variante → ítems separados
-- Combos → siempre un solo ítem con `isCombo: true`, nunca descomponer en productos individuales
-- `selectedVariant` → para bebestibles individuales y combos con 1 bebida
-- `selectedVariants[]` → para combos con múltiples bebidas elegidas
+- Persistido en `localStorage` (`burger-real-cart`).
+- Misma burger con distinta personalización / distinta variante / promo vs carta → ítems separados.
 
-### Precios
-- Bajar un ingrediente a 0 → NO descuenta el precio base
-- Subir un ingrediente sobre `defaultQuantity` → suma `extraPrice` por unidad excedente
-- `precioOferta` en burger de la semana → si viene `null`, ocultar botón y mostrar "Lunes a Jueves"
+### Checkout y delivery
+- Nombre (solo letras, ≤80) y teléfono con prefijo fijo `+569` + 8 dígitos (se formatea al escribir).
+- Formulario guardado en `sessionStorage` (`burger-real-checkout-form`).
+- **Retiro** (sin costo) o **Delivery**:
+  - Con GPS: distancia Haversine × `factorRuta` (1.25), redondeada hacia arriba a 0,1 km → tramo de `DELIVERY_CONFIG.tramos` (hasta 10 km). Fuera de cobertura bloquea el envío.
+  - Sin GPS: dirección escrita obligatoria y delivery "por confirmar" (el total se muestra como provisional).
+  - GPS: alta precisión y reintento en modo normal; mensajes guiados para iPhone.
+- Pago: transferencia (copia datos bancarios) o efectivo (monto ≥ total, calcula vuelto).
+- Envío: `window.open(wa.me)`; si el navegador bloquea el popup, se muestra enlace de respaldo y **no** se vacía el carrito. Al enviar: limpia carrito y formulario y vuelve a `/menu`.
+- Notas del cliente se aplanan a una sola línea en el mensaje (evita inyectar secciones falsas).
 
 ---
 
 ## Convenciones de Código
 
 ### Signals (obligatorio)
-Usar signals para todo el estado reactivo. **No usar Reactive Forms ni BehaviorSubject.**
-
-```ts
-// ✅ Correcto
-nombre = signal('');
-isValid = computed(() => this.nombre().trim().length > 0);
-
-// ❌ Incorrecto
-nombreControl = new FormControl('');
-```
+Signals / `computed` / `effect` para todo el estado. **Sin Reactive Forms, sin `ngModel`, sin `BehaviorSubject`.**
+Los inputs se manejan con `(input)` + `signal.set(...)`. RxJS solo donde lo exige Angular (router, preloading, `fromEvent`, `dialogRef.closed`).
 
 ### Componentes
-- Todos los componentes son **standalone**
-- Inyección con `inject()`, no constructor injection
-- `@for` con `track` por ID siempre — nunca `track $index` para listas de objetos, solo para arrays de strings
-
-```ts
-// ✅ Correcto
-@for (item of items; track item.id) { }
-@for (text of strings; track $index) { }
-```
+- Standalone, inyección con `inject()` (los `constructor()` existentes son solo para `effect`).
+- `@for` con `track` por id; `track $index` solo para arrays de strings.
+  (Excepción actual a corregir: `combo-detail-modal` y `combo-modal` usan `track $index` sobre objetos.)
+- `ChangeDetectionStrategy.OnPush` en componentes nuevos (ya lo usa `MenuComponent`).
 
 ### Modales (CDK Dialog)
-Usar siempre `@angular/cdk/dialog` — nunca Angular Material Dialog.
+Siempre `@angular/cdk/dialog`, nunca Material.
 
 ```ts
 const ref = this.dialog.open<ResultType, DataType>(ComponentModal, {
+  data: { ... },
   backdropClass: 'burger-dialog-backdrop',
   panelClass: 'burger-modal-pane',
-  width: '420px',
+  width: '420px',          // 380px para selectores simples
   maxWidth: '95vw',
+  autoFocus: 'first-tabbable',
 });
 ```
 
 ### Estilos
-- Tailwind v4 para layout y spacing
-- Estilos de marca como `style=""` inline cuando sean valores exactos del sistema de diseño
-- **Sin fondos blancos** en ninguna sección — todo en escala de oscuros y naranja
-- Mobile-first siempre — breakpoints `md:` y `lg:` solo para adaptaciones desktop
+- Tailwind v4 para layout/spacing; valores exactos de marca pueden ir inline (`style=""`).
+- **Sin fondos blancos** — solo oscuros y naranja.
+- Mobile-first; `md:` / `lg:` solo para adaptar a desktop.
+- Inputs con `font-size: 16px` en móvil (evita zoom de iOS; regla global en `styles.css`).
+- Respetar `prefers-reduced-motion` (regla global ya existente).
+
+### Imágenes
+- URLs de Cloudinary con `w_600,f_auto,q_auto` en el catálogo; el hero semanal aplica `c_fill,g_auto,w_800,h_500` automáticamente.
+- Si no hay `imageUrl`, la tarjeta muestra un ícono; la burger de la semana usa un fallback de Unsplash.
+
+### Commits
+Formato convencional en español: `feat(ámbito): descripción`, `fix(ámbito): descripción`.
+
+---
+
+## Seguridad / Netlify
+- `netlify.toml` define redirect SPA, caché (HTML sin caché, JS/CSS inmutables) y cabeceras de seguridad con **CSP**.
+- CSP actual: `img-src` permite Unsplash y Cloudinary; `connect-src 'self'`.
+  ➜ **Si se conecta un backend o se agrega un dominio de imágenes/fuentes, hay que actualizar la CSP** o el navegador lo bloqueará en producción.
+- `public/_redirects` duplica el redirect SPA (redundante con `netlify.toml`).
+- `environment.ts` contiene número de WhatsApp real y datos bancarios (se muestran al cliente). No hay `environment.prod.ts` ni `fileReplacements`.
 
 ---
 
 ## Estado Actual del Proyecto
 
 ### ✅ Completado
-- Menú completo con categorías (Hamburguesas, Acompañamientos, Bebestibles)
-- Sistema de personalización de ingredientes con modal
-- Variantes de tamaño para acompañamientos (vienen del backend)
-- Sistema de combos con selección de bebida (modal secuencial para múltiples bebidas)
-- Carrito con drawer, edición, vaciar con confirmación
-- Toast notifications inteligente (modo ametralladora)
-- Pantalla de confirmación de pedido (`/confirmar-pedido`)
-- Integración WhatsApp con formato detallado del pedido
-- Datos bancarios para transferencia (en `environment.ts`)
-- Burger de la semana con precio de oferta y bloqueo fin de semana
-- Modal informativo de combos
-- Animaciones de entrada/salida del drawer
-- Preloading estratégico de rutas
-- Scroll lock del body cuando el drawer está abierto
-- Guard de ruta para `/confirmar-pedido`
+- Home, menú con tabs por categoría (scroll-spy) y acceso directo `?cat=`
+- Catálogo maestro de ingredientes + recetas + combos con precio calculado
+- Personalización de burgers (contador y toggle, extras por categoría)
+- Porciones de acompañamientos
+- Combos con selección de bebidas paso a paso y modal informativo
+- Burger de la semana con rotación diaria lunes–jueves
+- Carrito drawer: editar personalización, cantidades, vaciar con confirmación, persistencia
+- Toast "modo ametralladora"
+- Checkout con validaciones, delivery por distancia con GPS, efectivo con vuelto, transferencia
+- Mensaje de WhatsApp detallado + fallback de popup bloqueado
+- Imágenes reales en Cloudinary + visor ampliado (lightbox)
+- Deploy en Netlify con cabeceras de seguridad
+- Guard de `/confirmar-pedido` y redirección si el carrito queda vacío
 
-### 🔄 Pendiente
-- Registrar la venta en el backend al enviar el pedido por WhatsApp
-- Refactor general (limpiar `menu.data.ts`, revisar `customizable` hardcodeado)
-- Vista desktop (actualmente mobile-first, desktop pendiente de rediseño)
-- Autenticación y seguridad de la API
-- Imágenes reales de productos (actualmente Unsplash placeholders)
+### 🔄 Pendiente / deuda técnica
+- Definir integración con backend (catálogo, registrar la venta al enviar el pedido) — requiere actualizar CSP
+- Activar `"strict": true` y `strictTemplates` en TypeScript
+- Arreglar o reescribir `app.spec.ts` (espera un `h1` "Hello, burger-real-front" que no existe)
+- Limpiar código sin uso: `api-*.model.ts` (o reutilizarlos al conectar backend), `price.utils.ts`, rama de variantes de `ProductCardComponent.add()` + `drink-selector-modal`
+- Cambiar `track $index` sobre objetos en `combo-detail-modal` y `combo-modal`
+- Vista desktop (hoy mobile-first)
+- Bundle inicial ~467 kB (budget de warning: 500 kB) — vigilar al agregar dependencias
 
 ---
 
 ## Flujo Principal del Usuario
 
 ```
-Home → Menú → [Agregar productos / Personalizar] → Carrito (Drawer) → /confirmar-pedido → WhatsApp
+Home → Menú → [Agregar / Personalizar / Combo / Promo] → Carrito (drawer) → /confirmar-pedido → WhatsApp
 ```
 
-### Flujo de personalización burger
-1. Botón `"+ Agregar"` → agrega receta original directo
-2. Botón `"Personalizar"` → abre `IngredientModalComponent`
-3. Modal muestra ingredientes incluidos + extras disponibles del catálogo
-4. Al confirmar → `CartService.addItem()` con snapshot de ingredientes
+### Burger
+1. `"+ Agregar"` → receta original directa (`addOriginal`).
+2. `"Personalizar"` → `IngredientModalComponent` → `CartService.addItem()` con snapshot de ingredientes.
 
-### Flujo de combo
-1. Ícono ℹ️ → abre `ComboDetailModalComponent` (solo informativo)
-2. Botón `"Agregar"` → verifica si hay detalles con `requiereSeleccion: true`
-3. Si hay → abre `ComboModalComponent` N veces según `cantidad` (secuencial)
-4. Al confirmar todo → `CartService.addCombo()` con `selectedVariants[]`
+### Combo
+1. Ícono ℹ️ → `ComboDetailModalComponent` (informativo).
+2. `"Agregar"` → por cada unidad de detalles con `requiereSeleccion` abre `ComboModalComponent` en secuencia.
+3. Al terminar → `CartService.addCombo(combo, selectedVariants)`.
+
+### Burger de la semana
+`BurgerOfTheWeekModalComponent` confirma → `addItem(..., isPromo=true, promoDate)` con `precioOferta`.
 
 ---
 
-## Variables de Entorno (`environment.ts`)
+## Notas para Claude
 
-```ts
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:8080',
-  whatsappNumber: '56XXXXXXXXX',
-  localName: 'Burger Real',
-  bankDetails: {
-    ownerName: 'Daniel Esteban Arellano González',
-    rut: '19.417.074-2',
-    bank: 'Mercado Pago',
-    accountType: 'Cuenta Vista',
-    accountNumber: '1024130786',
-    email: 'danielarellanogonzalez97@gmail.com',
-  },
-};
-```
-
----
-
-## Notas para Claude Code
-
-- **Siempre ejecutar `ng build` al finalizar** para verificar que no hay errores de compilación
-- Los cambios deben ser **quirúrgicos** — no tocar nada que no esté mencionado en el prompt
-- Las imágenes de productos usan Unsplash como placeholder — no crear lógica para imágenes reales
-- El número de WhatsApp en `environment.ts` debe reemplazarse con el número real antes del lanzamiento
-- Para el futuro endpoint `GET /api/productos?categoria=HAMBURGUESA`, solo hay que cambiar la URL en `ProductoService.loadProducts()`
+- **Verificar compilación al terminar**: `pnpm build` (o `ng build`). Debe compilar sin errores ni warnings.
+- Cambios **quirúrgicos**: no tocar nada que no esté mencionado en el pedido.
+- El usuario quiere explicaciones detalladas de cada cambio (qué, dónde y por qué), no solo el código.
+- Para cambiar precios, productos o tramos de delivery: editar `core/data/*` o `core/config/delivery.config.ts`, no los componentes.
+- Mantener este archivo actualizado cuando cambie la arquitectura, reglas o pendientes.
