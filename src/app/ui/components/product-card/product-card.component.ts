@@ -1,4 +1,5 @@
 import { Component, inject, computed, input, signal } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { Dialog } from '@angular/cdk/dialog';
 import { LucidePlus, LucideMinus, LucideImageOff, LucideSlidersHorizontal, LucidePencil, LucideMaximize2 } from '@lucide/angular';
 import { Product } from '../../../domain/catalog/catalog.models';
@@ -16,7 +17,7 @@ import {
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [LucidePlus, LucideMinus, LucideImageOff, LucideSlidersHorizontal, LucidePencil, LucideMaximize2],
+  imports: [NgOptimizedImage, LucidePlus, LucideMinus, LucideImageOff, LucideSlidersHorizontal, LucidePencil, LucideMaximize2],
   template: `
     @if (product().category === 'hamburguesas') {
       <!-- HAMBURGUESA LAYOUT: imagen+info arriba, botones full-width abajo -->
@@ -28,7 +29,7 @@ import {
         <!-- Fila superior: imagen + info -->
         <div class="flex items-start gap-3 p-3 pb-2">
           <div class="relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-brand-surface-2">
-            @if (product().imageUrl && !imgError()) {
+            @if (product().image && !imgError()) {
               <button
                 type="button"
                 (click)="openImage()"
@@ -36,10 +37,12 @@ import {
                 [attr.aria-label]="'Ampliar imagen de ' + product().name"
               >
                 <img
-                  [src]="product().imageUrl"
+                  [ngSrc]="product().image!"
                   [alt]="product().name"
+                  width="80"
+                  height="80"
+                  [loaderParams]="{ aspectRatio: 1 }"
                   class="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
-                  loading="lazy"
                   (error)="imgError.set(true)"
                 />
                 <span
@@ -123,7 +126,7 @@ import {
       >
         <!-- Product image -->
         <div class="relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden bg-brand-surface-2">
-          @if (product().imageUrl && !imgError()) {
+          @if (product().image && !imgError()) {
             <button
               type="button"
               (click)="openImage()"
@@ -131,10 +134,12 @@ import {
               [attr.aria-label]="'Ampliar imagen de ' + product().name"
             >
               <img
-                [src]="product().imageUrl"
+                [ngSrc]="product().image!"
                 [alt]="product().name"
+                width="96"
+                height="96"
+                [loaderParams]="{ aspectRatio: 1 }"
                 class="w-full h-full object-cover transition-transform duration-200 hover:scale-105"
-                loading="lazy"
                 (error)="imgError.set(true)"
               />
               <span
@@ -263,8 +268,8 @@ export class ProductCardComponent {
 
   /** Abre la foto del producto en grande. */
   openImage(): void {
-    const { imageUrl, name } = this.product();
-    if (imageUrl) openImageLightbox(this.dialog, { src: imageUrl, alt: name });
+    const { image, name } = this.product();
+    if (image) openImageLightbox(this.dialog, { src: image, alt: name });
   }
 
   /** Personalizar burger o elegir porción de un acompañamiento. */

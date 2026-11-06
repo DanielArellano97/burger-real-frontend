@@ -1,6 +1,7 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { Dialog, DialogRef, DIALOG_DATA } from '@angular/cdk/dialog';
 import { LucideX } from '@lucide/angular';
+import { cloudinaryUrl } from '../../../infrastructure/images/cloudinary-image.loader';
 
 export interface ImageLightboxData {
   /** URL de la imagen que se muestra en grande. */
@@ -37,7 +38,7 @@ export interface ImageLightboxData {
         <p class="font-body text-sm" style="color: #888;">No se pudo cargar la imagen.</p>
       } @else {
         <img
-          [src]="data.src"
+          [src]="fullSrc"
           [alt]="data.alt"
           (click)="$event.stopPropagation()"
           (error)="error.set(true)"
@@ -56,6 +57,9 @@ export class ImageLightboxComponent {
   private dialogRef = inject<DialogRef<never>>(DialogRef);
 
   error = signal(false);
+
+  /** Versión grande (1200 px) de la foto, sin recorte. */
+  readonly fullSrc = cloudinaryUrl(this.data.src, 1200);
 
   constructor() {
     // Evita que la página de fondo se desplace mientras se ve la imagen.

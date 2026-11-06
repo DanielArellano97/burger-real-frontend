@@ -49,13 +49,17 @@
         Burger de la semana</p>
     </div>
     <div class="mx-4 mb-2 rounded-2xl overflow-hidden relative" style="border: 1px solid #F07800; background: #0F0F0F;">
-      <img [src]="burgerImage()"
+      <!-- priority: es la imagen principal (LCP) del menú, se pide primero. -->
+      <img [ngSrc]="heroImage()"
         (click)="openWeeklyImage()"
-        (error)="$any($event.target).src = burgerFallbackImage"
+        (error)="heroError.set(true)"
         [alt]="bw.name"
+        width="512" height="260"
+        priority
+        [loaderParams]="{ aspectRatio: 1.97 }"
         class="cursor-zoom-in"
-        style="width: 100%; aspect-ratio: 512 / 260; object-fit: cover; display: block;"
-        loading="eager" />
+        [style.object-fit]="heroIsFallback() ? 'contain' : 'cover'"
+        style="width: 100%; height: auto; aspect-ratio: 512 / 260; display: block;" />
       <button
         (click)="openWeeklyImage()"
         class="absolute top-2 right-2 z-10 flex items-center justify-center w-8 h-8 rounded-lg transition-transform active:scale-95"
@@ -112,8 +116,11 @@
     @for (combo of combos(); track combo.id) {
     <div class="flex-shrink-0 rounded-xl overflow-hidden"
       style="width: 140px; background: #1A1A1A; border: 1px solid #2A2A2A;">
-      <img [src]="combo.imageUrl" [alt]="combo.name"
-        style="width: 100%; height: 75px; object-fit: cover; display: block;" loading="lazy" />
+      @if (combo.image) {
+      <img [ngSrc]="combo.image" [alt]="combo.name" width="140" height="75"
+        [loaderParams]="{ aspectRatio: 1.87 }"
+        style="width: 100%; height: 75px; object-fit: cover; display: block;" />
+      }
       <div class="p-2">
         <p style="color: #F0F0F0; font-size: 13px; font-weight: 600; line-height: 1.3;">{{ combo.name }}</p>
         <div class="flex items-center justify-between mt-1">

@@ -84,7 +84,8 @@ export interface Product {
   allowsExtras: boolean;
   /** `false` = agotado: se muestra pero no se puede pedir. */
   available: boolean;
-  imageUrl: string | null;
+  /** Id público de Cloudinary (o URL/asset local); `null` = sin foto. */
+  image: string | null;
   ingredients: readonly Ingredient[];
   portions: readonly Portion[];
   includes: readonly IncludedItem[];
@@ -120,7 +121,7 @@ export interface Combo {
   id: number;
   name: string;
   description: string;
-  imageUrl: string | null;
+  image: string | null;
   /** Suma de `unitPrice × quantity` de sus líneas. */
   price: number;
   available: boolean;

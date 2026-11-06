@@ -92,7 +92,7 @@ export function mapCatalog(records: CatalogRecords): Catalog {
       customizable: category !== 'bebestibles',
       allowsExtras: r.permiteExtras,
       available: r.disponible,
-      imageUrl: r.imagenUrl,
+      image: r.imagen,
       ingredients,
       portions: (portions.get(r.id) ?? []).map(toPortion),
       includes: (includes.get(r.id) ?? []).map((i): IncludedItem => ({
@@ -195,7 +195,7 @@ export function mapCatalog(records: CatalogRecords): Catalog {
       id: r.id,
       name: r.nombre,
       description: r.descripcion,
-      imageUrl: r.imagenUrl,
+      image: r.imagen,
       price: comboTotal(lines),
       // Agotado si se marca así o si falta alguno de sus componentes.
       available: r.disponible && fixedProductsAvailable && selectionsPossible,

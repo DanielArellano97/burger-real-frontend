@@ -3,6 +3,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
+import { NgOptimizedImage } from '@angular/common';
 import { Dialog } from '@angular/cdk/dialog';
 import { LucideMaximize2 } from '@lucide/angular';
 import { CartService } from '../../../application/cart.service';
@@ -42,7 +43,7 @@ const MODAL_OPTIONS = {
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [ProductCardComponent, LucideMaximize2, StoreClosedBannerComponent],
+  imports: [NgOptimizedImage, ProductCardComponent, LucideMaximize2, StoreClosedBannerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './menu.component.html',
 })
@@ -63,9 +64,9 @@ export class MenuComponent implements AfterViewInit, OnDestroy {
   readonly formatPrice = formatPrice;
   readonly storeOpen = inject(StoreStatusService).isOpen;
 
-  /** Imagen de respaldo si la burger de la semana no tiene `imageUrl`. */
-  readonly burgerFallbackImage =
-    'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=400&fit=crop';
+  /** Imagen de respaldo (logo local) si la burger de la semana no tiene foto o falla. */
+  readonly fallbackImage = 'images/logo-burger-real.webp';
+  readonly heroError = signal(false);
 
   readonly burgerOfTheWeek = computed<OfferBurger | null>(() =>
     burgerOfTheDay(this.catalog.burgers(), this.clock.now())
@@ -74,13 +75,11 @@ export class MenuComponent implements AfterViewInit, OnDestroy {
   /** Solo lunes a jueves se muestra el precio de oferta y el botón Agregar. */
   readonly offerActive = computed(() => isOfferDay(this.clock.now()));
 
-  /**
-   * Imagen del hero semanal con recorte inteligente de Cloudinary
-   * (`c_fill,g_auto`): llena la tarjeta y centra el encuadre en la burger.
-   */
-  readonly burgerImage = computed(() =>
-    this.smartCrop(this.burgerOfTheWeek()?.imageUrl || this.burgerFallbackImage)
+  /** Foto del hero: Cloudinary la recorta a la forma de la tarjeta (ver template). */
+  readonly heroImage = computed(() =>
+    this.heroError() ? this.fallbackImage : (this.burgerOfTheWeek()?.image ?? this.fallbackImage)
   );
+  readonly heroIsFallback = computed(() => this.heroImage() === this.fallbackImage);
 
   private observers: IntersectionObserver[] = [];
 
@@ -88,21 +87,6 @@ export class MenuComponent implements AfterViewInit, OnDestroy {
     effect(() => {
       if (!this.catalog.loading()) setTimeout(() => this.setupSectionObservers());
     });
-  }
-
-  private smartCrop(url: string): string {
-    if (!url.startsWith('https://res.cloudinary.com/')) return url;
-
-    const marker = '/image/upload/';
-    const index = url.indexOf(marker);
-    if (index === -1) return url;
-
-    // Si el primer segmento no es una versión (`v123…`), ya hay una
-    // transformación aplicada y se respeta para no encadenar recortes.
-    const firstSegment = url.slice(index + marker.length).split('/')[0];
-    if (!/^v\d+$/.test(firstSegment)) return url;
-
-    return url.replace(marker, `${marker}c_fill,g_auto,w_800,h_500/`);
   }
 
   /** Productos de la categoría; con la promo activa la burger del día no se repite. */
@@ -198,7 +182,7 @@ export class MenuComponent implements AfterViewInit, OnDestroy {
 
   openWeeklyImage(): void {
     const burger = this.burgerOfTheWeek();
-    if (burger) openImageLightbox(this.dialog, { src: burger.imageUrl || this.burgerFallbackImage, alt: burger.name });
+    if (burger) openImageLightbox(this.dialog, { src: burger.image ?? this.fallbackImage, alt: burger.name });
   }
 
   openBurgerOfTheWeekModal(): void {

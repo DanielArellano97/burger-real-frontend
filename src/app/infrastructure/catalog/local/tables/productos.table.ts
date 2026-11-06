@@ -15,7 +15,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: null,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793550658/Cheeseburger_gourmet_con_queso_fundido.png',
+    imagen: 'v1793550658/Cheeseburger_gourmet_con_queso_fundido.png',
   },
   {
     id: 2,
@@ -28,7 +28,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: null,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793551236/Hamburguesa_con_tocino_y_queso_fundido.png',
+    imagen: 'v1793551236/Hamburguesa_con_tocino_y_queso_fundido.png',
   },
   {
     id: 3,
@@ -41,7 +41,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: null,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793551481/Hamburguesa_con_cebolla_caramelizada.png',
+    imagen: 'v1793551481/Hamburguesa_con_cebolla_caramelizada.png',
   },
   {
     id: 4,
@@ -54,7 +54,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: null,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793300205/Hamburguesa_gourmet_con_aros_de_cebolla.png',
+    imagen: 'v1793300205/Hamburguesa_gourmet_con_aros_de_cebolla.png',
   },
   {
     id: 5,
@@ -67,7 +67,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: null,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793551840/Hamburguesa_gourmet_con_cebolla_caramelizada_y_tocino.png',
+    imagen: 'v1793551840/Hamburguesa_gourmet_con_cebolla_caramelizada_y_tocino.png',
   },
   {
     id: 6,
@@ -80,7 +80,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: null,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793299884/Hamburguesa_doble_con_cebolla_caramelizada.png',
+    imagen: 'v1793299884/Hamburguesa_doble_con_cebolla_caramelizada.png',
   },
   {
     id: 7,
@@ -93,7 +93,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: null,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793552082/Hamburguesa_doble_con_tocino_y_queso.png',
+    imagen: 'v1793552082/Hamburguesa_doble_con_tocino_y_queso.png',
   },
   {
     id: 8,
@@ -106,7 +106,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: null,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793297298/Hamburguesa_gourmet_con_guacamole_y_cheddar.png',
+    imagen: 'v1793297298/Hamburguesa_gourmet_con_guacamole_y_cheddar.png',
   },
   {
     id: 9,
@@ -119,7 +119,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: null,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793296282/Hamburguesa_gourmet_con_huevo_y_guacamole.png',
+    imagen: 'v1793296282/Hamburguesa_gourmet_con_huevo_y_guacamole.png',
   },
   {
     id: 10,
@@ -132,7 +132,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: null,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793297458/Hamburguesa_gourmet_con_huevo_frito.png',
+    imagen: 'v1793297458/Hamburguesa_gourmet_con_huevo_frito.png',
   },
   {
     id: 11,
@@ -145,7 +145,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: null,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793732948/Papas_fritas_doradas_sazonadas_en_bandeja_checkered.png',
+    imagen: 'v1793732948/Papas_fritas_doradas_sazonadas_en_bandeja_checkered.png',
   },
   {
     id: 12,
@@ -158,7 +158,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: null,
     permiteExtras: false,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793731529/Aros_de_cebolla_crujientes_en_pizarra.png',
+    imagen: 'v1793731529/Aros_de_cebolla_crujientes_en_pizarra.png',
   },
   {
     id: 13,
@@ -171,7 +171,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: null,
     permiteExtras: false,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793731757/Tiras_de_pollo_crujientes_doradas.png',
+    imagen: 'v1793731757/Tiras_de_pollo_crujientes_doradas.png',
   },
   {
     id: 21,
@@ -184,7 +184,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: 1000,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793552615/WhatsApp_Image_2026-11-01_at_2.03.07_PM.jpg',
+    imagen: 'v1793552615/WhatsApp_Image_2026-11-01_at_2.03.07_PM.jpg',
   },
   {
     id: 22,
@@ -197,7 +197,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: 1000,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793552726/WhatsApp_Image_2026-11-01_at_2.05.15_PM.jpg',
+    imagen: 'v1793552726/WhatsApp_Image_2026-11-01_at_2.05.15_PM.jpg',
   },
   {
     id: 23,
@@ -210,7 +210,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: 1000,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793552838/WhatsApp_Image_2026-11-01_at_2.05.50_PM.jpg',
+    imagen: 'v1793552838/WhatsApp_Image_2026-11-01_at_2.05.50_PM.jpg',
   },
   {
     id: 24,
@@ -223,7 +223,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: 1000,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793553001/Gemini_Generated_Image_g9ac1eg9ac1eg9ac.jpg',
+    imagen: 'v1793553001/Gemini_Generated_Image_g9ac1eg9ac1eg9ac.jpg',
   },
   {
     id: 25,
@@ -236,6 +236,6 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioCombo: 1000,
     permiteExtras: true,
     disponible: true,
-    imagenUrl: 'https://res.cloudinary.com/zas3mkmm/image/upload/w_600,f_auto,q_auto/v1793553109/Gemini_Generated_Image_jxmt8qjxmt8qjxmt.jpg',
+    imagen: 'v1793553109/Gemini_Generated_Image_jxmt8qjxmt8qjxmt.jpg',
   },
 ];

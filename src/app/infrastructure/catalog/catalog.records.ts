@@ -40,7 +40,8 @@ export interface ProductoRecord {
   precioCombo: number | null;
   permiteExtras: boolean;
   disponible: boolean;
-  imagenUrl: string | null;
+  /** Id público de Cloudinary (ej. `v123/foto.png`); `null` = sin foto. */
+  imagen: string | null;
 }
 
 /** Tabla `producto_ingredientes` (receta). */
@@ -79,7 +80,8 @@ export interface ComboRecord {
   nombre: string;
   descripcion: string;
   disponible: boolean;
-  imagenUrl: string | null;
+  /** Id público de Cloudinary; `null` = sin foto. */
+  imagen: string | null;
 }
 
 /** Tabla `combo_detalles`. */
