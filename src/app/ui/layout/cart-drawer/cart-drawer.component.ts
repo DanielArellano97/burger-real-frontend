@@ -23,8 +23,8 @@ import {
       <!-- Overlay -->
       <div
         class="fixed inset-0 z-40 bg-black"
-  [class.overlay-fade-in]="!isClosing()"
-  [class.overlay-fade-out]="isClosing()"
+        [class.overlay-fade-in]="!isClosing()"
+        [class.overlay-fade-out]="isClosing()"
         (click)="cartService.closeDrawer()"
         aria-hidden="true"
       ></div>
@@ -37,9 +37,9 @@ import {
         aria-modal="true"
         aria-label="Carrito de compras"
         class="fixed top-0 right-0 bottom-0 z-50 w-[90%] max-w-sm flex flex-col"
-  [class.drawer-slide-in]="!isClosing()"
-  [class.drawer-slide-out]="isClosing()"
-  style="background: #1A1A1A; border-left: 1px solid #2A2A2A;"
+        [class.drawer-slide-in]="!isClosing()"
+        [class.drawer-slide-out]="isClosing()"
+        style="background: #1A1A1A; border-left: 1px solid #2A2A2A;"
       >
         <!-- Header -->
         <div class="flex items-center justify-between px-4 py-4 border-b" style="border-color: #2A2A2A;">
@@ -191,31 +191,32 @@ import {
               <svg lucideShoppingCart class="w-5 h-5" aria-hidden="true"></svg>
               Ir a confirmar
             </button>
-<div class="h-14 flex items-center">
-  @if (confirmingClear()) {
-    <div class="flex items-center justify-between w-full gap-2">
-      <span class="font-body text-sm" style="color: #888;">¿Vaciar carrito?</span>
-      <div class="flex gap-2">
-        <button
-          (click)="confirmingClear.set(false)"
-          class="px-3 py-1.5 rounded-lg font-body text-sm transition-colors border"
-          style="color: #888; border-color: #2A2A2A; background: transparent;"
-        >Cancelar</button>
-        <button
-          (click)="confirmClear()"
-          class="px-3 py-1.5 rounded-lg font-body text-sm font-semibold transition-colors"
-          style="background: #F07800; color: #1A1A1A;"
-        >Sí, vaciar</button>
-      </div>
-    </div>
-  } @else {
-    <button
-      (click)="confirmingClear.set(true)"
-      class="w-full py-2 font-body text-sm transition-colors hover:text-red-400"
-      style="color: #666;"
-    >Vaciar carrito</button>
-  }
-</div>
+            <!-- Vaciar carrito (con confirmación) -->
+            <div class="h-14 flex items-center">
+              @if (confirmingClear()) {
+                <div class="flex items-center justify-between w-full gap-2">
+                  <span class="font-body text-sm" style="color: #888;">¿Vaciar carrito?</span>
+                  <div class="flex gap-2">
+                    <button
+                      (click)="confirmingClear.set(false)"
+                      class="px-3 py-1.5 rounded-lg font-body text-sm transition-colors border"
+                      style="color: #888; border-color: #2A2A2A; background: transparent;"
+                    >Cancelar</button>
+                    <button
+                      (click)="confirmClear()"
+                      class="px-3 py-1.5 rounded-lg font-body text-sm font-semibold transition-colors"
+                      style="background: #F07800; color: #1A1A1A;"
+                    >Sí, vaciar</button>
+                  </div>
+                </div>
+              } @else {
+                <button
+                  (click)="confirmingClear.set(true)"
+                  class="w-full py-2 font-body text-sm transition-colors hover:text-red-400"
+                  style="color: #666;"
+                >Vaciar carrito</button>
+              }
+            </div>
           </div>
         }
       </div>

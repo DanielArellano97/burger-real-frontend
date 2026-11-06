@@ -351,37 +351,37 @@ export class ConfirmOrderComponent implements OnInit {
   }
 
   copyAccountNumber(): void {
-  const details = this.bankDetails;
-  const text = [
-    `Banco: ${details.bank}`,
-    `Tipo de cuenta: ${details.accountType}`,
-    `N° de cuenta: ${details.accountNumber}`,
-    `RUT: ${details.rut}`,
-    `Nombre: ${details.ownerName}`,
-    `Email: ${details.email}`,
-  ].join('\n');
+    const details = this.bankDetails;
+    const text = [
+      `Banco: ${details.bank}`,
+      `Tipo de cuenta: ${details.accountType}`,
+      `N° de cuenta: ${details.accountNumber}`,
+      `RUT: ${details.rut}`,
+      `Nombre: ${details.ownerName}`,
+      `Email: ${details.email}`,
+    ].join('\n');
 
-  if (navigator.clipboard && window.isSecureContext) {
-    // HTTPS — método moderno
-    navigator.clipboard.writeText(text).then(() => {
+    if (navigator.clipboard && window.isSecureContext) {
+      // HTTPS: API moderna del portapapeles.
+      navigator.clipboard.writeText(text).then(() => {
+        this.copied.set(true);
+        setTimeout(() => this.copied.set(false), 2500);
+      });
+    } else {
+      // HTTP (desarrollo local): método clásico con un textarea temporal.
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
       this.copied.set(true);
       setTimeout(() => this.copied.set(false), 2500);
-    });
-  } else {
-    // HTTP fallback — funciona en desarrollo local
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    this.copied.set(true);
-    setTimeout(() => this.copied.set(false), 2500);
+    }
   }
-}
 
   confirmOrder(): void {
     if (!this.isFormValid()) return;

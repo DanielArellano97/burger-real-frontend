@@ -118,7 +118,7 @@ import {
         }
       </article>
     } @else {
-      <!-- LAYOUT ORIGINAL para acompañamientos, bebestibles y extras -->
+      <!-- LAYOUT COMPACTO: acompañamientos y bebestibles -->
       <article
         class="flex gap-3 p-3 rounded-xl border transition-all duration-200 hover:-translate-y-0.5"
         style="background: #1A1A1A; border-color: #2A2A2A; box-shadow: 0 2px 12px rgba(0,0,0,0.3);"
@@ -192,7 +192,7 @@ import {
             </div>
             }
           } @else {
-            <!-- DEFAULT LAYOUT (bebestibles, extras) -->
+            <!-- BEBESTIBLES: se agregan directo -->
             <div>
               <h3 class="font-heading font-semibold text-base text-brand-white leading-tight truncate">
                 {{ product().name }}
