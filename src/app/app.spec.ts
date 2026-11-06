@@ -1,23 +1,26 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { App } from './app';
+import { appConfig } from './app.config';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
+      providers: [...appConfig.providers, provideRouter([])],
     }).compileComponents();
   });
 
-  it('should create the app', () => {
+  it('se crea con todas sus dependencias (puertos → adaptadores)', () => {
     const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+    expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should render title', async () => {
+  it('muestra la barra de navegación con el carrito', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, burger-real-front');
+    const html = fixture.nativeElement as HTMLElement;
+    expect(html.querySelector('app-navbar')).not.toBeNull();
+    expect(html.querySelector('[aria-label*="arrito"]')).not.toBeNull();
   });
 });
