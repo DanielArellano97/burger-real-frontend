@@ -39,6 +39,9 @@ testem.log
 /typings
 __screenshots__/
 
+# Claude: permisos locales de cada máquina
+.claude/settings.local.json
+
 # System files
 .DS_Store
 Thumbs.db
