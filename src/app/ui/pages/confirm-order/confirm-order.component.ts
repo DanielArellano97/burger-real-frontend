@@ -38,6 +38,8 @@ export class ConfirmOrderComponent implements OnInit {
 
   paymentMethod = signal<'transfer' | 'cash'>('transfer');
   copied        = signal(false);
+  /** `true` mientras se abre WhatsApp: evita un doble envío por doble toque. */
+  sending = signal(false);
   /** URL de respaldo cuando el navegador bloquea la ventana de WhatsApp. */
   whatsappFallbackUrl = signal<string | null>(null);
 
@@ -383,8 +385,8 @@ export class ConfirmOrderComponent implements OnInit {
     }
   }
 
-  confirmOrder(): void {
-    if (!this.isFormValid()) return;
+  async confirmOrder(): Promise<void> {
+    if (!this.isFormValid() || this.sending()) return;
 
     const deliveryInfo = this.deliveryInfo();
 
@@ -403,7 +405,10 @@ export class ConfirmOrderComponent implements OnInit {
       distanceKm:     deliveryInfo?.km ?? null,
     };
 
-    const { opened, url } = this.orderService.send(this.cartService.items(), orderData);
+    this.sending.set(true);
+    this.whatsappFallbackUrl.set(null);
+    const { opened, url } = await this.orderService.send(this.cartService.items(), orderData);
+    this.sending.set(false);
 
     if (!opened) {
       // El popup fue bloqueado: no borramos nada y mostramos un enlace

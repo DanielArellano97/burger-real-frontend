@@ -6,7 +6,10 @@ export interface SendResult {
   url: string;
 }
 
-/** Puerto: canal por el que sale el pedido (hoy WhatsApp). */
+/**
+ * Puerto: canal por el que sale el pedido (hoy WhatsApp).
+ * Es asíncrono porque confirmar la apertura puede tomar unos segundos.
+ */
 export abstract class OrderSender {
-  abstract send(message: string): SendResult;
+  abstract send(message: string): Promise<SendResult>;
 }

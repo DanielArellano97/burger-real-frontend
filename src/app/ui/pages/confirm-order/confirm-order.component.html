@@ -432,7 +432,7 @@
     }
     <button
       (click)="confirmOrder()"
-      [disabled]="!isFormValid()"
+      [disabled]="!isFormValid() || sending()"
       class="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-heading font-bold text-lg transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
       style="background: #25D366; color: #ffffff;"
       aria-label="Confirmar y enviar pedido por WhatsApp"

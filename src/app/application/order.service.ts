@@ -11,7 +11,7 @@ import { environment } from '../../environments/environment';
 export class OrderService {
   private readonly sender = inject(OrderSender);
 
-  send(items: readonly CartItem[], order: OrderData): SendResult {
+  send(items: readonly CartItem[], order: OrderData): Promise<SendResult> {
     const message = buildOrderMessage(items, order, {
       localName: environment.localName,
       bank: environment.bankDetails,
