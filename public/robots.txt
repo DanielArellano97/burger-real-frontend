@@ -1,0 +1,7 @@
+# Burger Real — https://burgerreal.netlify.app
+# Todo el sitio es público, salvo el checkout (no tiene contenido útil para buscadores).
+User-agent: *
+Allow: /
+Disallow: /confirmar-pedido
+
+Sitemap: https://burgerreal.netlify.app/sitemap.xml
