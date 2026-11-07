@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { cartGuard } from './routing/cart.guard';
+import { MenuComponent } from './ui/pages/menu/menu.component';
 
 export const routes: Routes = [
   {
@@ -8,10 +9,10 @@ export const routes: Routes = [
       import('./ui/pages/home/home.component').then(m => m.HomeComponent),
   },
   {
+    // Carga directa (no lazy): es la página más visitada y su foto principal es
+    // el LCP. Así el navegador no espera un JS extra antes de pedir esa foto.
     path: 'menu',
-    data: { preload: true },
-    loadComponent: () =>
-      import('./ui/pages/menu/menu.component').then(m => m.MenuComponent),
+    component: MenuComponent,
   },
   {
     path: 'confirmar-pedido',
