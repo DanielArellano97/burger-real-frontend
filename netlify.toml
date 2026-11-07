@@ -1,0 +1,64 @@
+[build]
+  command = "pnpm run build"
+  publish = "dist/burger-real-front/browser"
+
+[build.environment]
+  NODE_VERSION = "22"
+  PNPM_VERSION = "11.5.2"
+
+# SPA: cualquier ruta desconocida vuelve a index.html.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# El HTML siempre se revalida para que un deploy nuevo se vea al instante.
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/menu"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/confirmar-pedido"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Los assets de Angular llevan hash en el nombre: pueden cachearse para siempre.
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Nadie puede mostrar el sitio dentro de un iframe (anti-clickjacking).
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Solo se usa la ubicación (delivery); el resto de APIs sensibles queda bloqueado.
+    Permissions-Policy = "geolocation=(self), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    # CSP: scripts, estilos y fuentes propios (fuentes alojadas en el sitio); imágenes de Cloudinary.
+    # Si se conecta un backend, agregar su dominio a connect-src.
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://res.cloudinary.com; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
