@@ -167,8 +167,9 @@ en `netlify.toml`.
 
 - [ ] Confirmar en producción las URLs de Cloudinary con `c_fill,g_auto,ar_*` (fotos
       recortadas bien) y la vista previa al compartir el link.
-- [ ] Si se compra dominio propio: cambiar `SITE_URL` (`config/site.config.ts`) y
-      `og:url` / `canonical` de `index.html`, y redirigir el `.netlify.app` desde Netlify.
+- [ ] Si se compra dominio propio: cambiar `SITE_URL` (`config/site.config.ts`),
+      `og:url` / `canonical` de `index.html`, `public/robots.txt` y `public/sitemap.xml`,
+      y redirigir el `.netlify.app` desde Netlify.
 - [ ] Backend: lectura del catálogo (`HttpCatalogRepository`).
 - [ ] Backend: registrar pedidos al enviarlos.
 - [ ] Vista desktop.
