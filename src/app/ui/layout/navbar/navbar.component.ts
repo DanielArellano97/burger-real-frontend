@@ -15,8 +15,12 @@ import { CartService } from '../../../application/cart.service';
     >
       <a routerLink="/" aria-label="Ir al inicio — Burger Real" class="flex items-center">
         @if (!logoError()) {
+          <!-- Logo a 36 px: versiones 1x/2x/3x de 1-7 KB en vez del original de 48 KB. -->
           <img
-            src="images/logo-burger-real.webp"
+            src="images/logo-72.webp"
+            srcset="images/logo-36.webp 1x, images/logo-72.webp 2x, images/logo-108.webp 3x"
+            width="36"
+            height="36"
             alt="Burger Real"
             class="h-9 w-auto object-contain"
             (error)="logoError.set(true)"

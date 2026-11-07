@@ -24,8 +24,13 @@
       <!-- Logo -->
       <div class="mb-6 w-40 h-40 flex items-center justify-center">
         @if (!logoError()) {
+          <!-- Imagen principal del home (LCP): tamaño declarado y prioridad alta. -->
           <img
-            src="images/logo-burger-real.webp"
+            src="images/logo-320.webp"
+            srcset="images/logo-160.webp 1x, images/logo-320.webp 2x"
+            width="160"
+            height="160"
+            fetchpriority="high"
             alt="Logo Burger Real"
             class="w-full h-full object-contain drop-shadow-2xl"
             (error)="logoError.set(true)"
