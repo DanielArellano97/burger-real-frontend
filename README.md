@@ -4,6 +4,8 @@
 (burgers personalizables, acompañamientos, bebidas y combos), elige retiro o delivery,
 y el pedido llega al local como un **mensaje de WhatsApp** listo para confirmar.
 
+🌐 **Sitio:** [burgerreal.netlify.app](https://burgerreal.netlify.app)
+
 > **Estado:** MVP en producción sobre Netlify. Es un frontend estático: el menú vive en
 > el propio proyecto, ordenado igual que una base de datos para conectar un backend más
 > adelante sin reescribir la app.

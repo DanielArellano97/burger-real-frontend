@@ -5,7 +5,8 @@
 
 ## Qué es y estrategia
 
-Web mobile-first de pedidos para **Burger Real** (Chile). El cliente arma su pedido y lo
+Web mobile-first de pedidos para **Burger Real** (Chile).
+Sitio: **https://burgerreal.netlify.app** (definida en `config/site.config.ts` + `index.html`). El cliente arma su pedido y lo
 envía como **mensaje de WhatsApp**. Pago por transferencia o efectivo (sin pasarela).
 
 **Estrategia acordada (MVP → backend incremental):**
@@ -166,7 +167,8 @@ en `netlify.toml`.
 
 - [ ] Confirmar en producción las URLs de Cloudinary con `c_fill,g_auto,ar_*` (fotos
       recortadas bien) y la vista previa al compartir el link.
-- [ ] Cuando exista dominio propio, agregar `og:url` y `<link rel="canonical">`.
+- [ ] Si se compra dominio propio: cambiar `SITE_URL` (`config/site.config.ts`) y
+      `og:url` / `canonical` de `index.html`, y redirigir el `.netlify.app` desde Netlify.
 - [ ] Backend: lectura del catálogo (`HttpCatalogRepository`).
 - [ ] Backend: registrar pedidos al enviarlos.
 - [ ] Vista desktop.
