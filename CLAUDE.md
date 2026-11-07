@@ -155,6 +155,14 @@ en `netlify.toml`.
   no solo copiar).
 - Cambios **quirúrgicos**: no tocar lo que no se pidió. Todo debe seguir funcionando
   igual que antes.
+- **Ramas** (guía completa en `docs/FLUJO-RAMAS.md`):
+  `feature/…` → PR a `dev` → PR a `master` (producción en Netlify).
+  - Al empezar un trabajo: `git checkout dev && git pull` y crear una rama
+    (`feature/`, `fix/`, `docs/`, `perf/`). **Nunca commitear directo en `dev` ni en `master`.**
+  - Claude no hace push ni merge: deja los commits en la rama y el usuario abre los PR.
+  - Merges siempre con "Create a merge commit" (nunca squash ni rebase).
+  - Después de publicar en `master`: alinear `dev` con `master` y crear un tag (`vX.Y.Z`).
+  - Versiones: `v1.0.0` = lanzamiento del MVP (2026-11-07).
 - **Un commit por punto/tarea**, en español:
   `tipo(ámbito): resumen` + cuerpo con el detalle
   (`feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `build`, `style`, `security`, `chore`).

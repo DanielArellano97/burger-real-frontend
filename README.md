@@ -177,11 +177,30 @@ muestre la foto (tamaño exacto, AVIF/WebP y recorte inteligente).
 
 ---
 
+## 🌿 Flujo de trabajo (Git)
+
+```
+feature/…  ──PR──►  dev  ──PR──►  master  ──►  Netlify (producción)
+```
+
+- **`master`**: lo que ven los clientes. **`dev`**: base de todo cambio y entorno de prueba.
+  En ninguna de las dos se hacen commits directos.
+- Cada cambio va en su propia rama creada desde `dev`, se sube con un Pull Request a `dev`
+  y se publica con un Pull Request de `dev` a `master`. Siempre **"Create a merge commit"**.
+- Cada publicación lleva un tag de versión (`v1.0.0`, `v1.1.0`…).
+
+📖 Guía completa paso a paso, con hotfix y cambios desde el celular:
+[docs/FLUJO-RAMAS.md](docs/FLUJO-RAMAS.md)
+
+---
+
 ## ☁️ Despliegue
 
 Netlify compila con `pnpm run build` y publica `dist/burger-real-front/browser`
-(configurado en `netlify.toml`, Node 22 y pnpm 11.5.2). Cada push a la rama
-configurada genera un deploy; las ramas generan *Deploy Previews* para probar antes.
+(configurado en `netlify.toml`, Node 22 y pnpm 11.5.2).
+- **Producción:** rama `master` → https://burgerreal.netlify.app
+- **Pruebas:** rama `dev` → https://dev--burgerreal.netlify.app
+- **Deploy Previews:** uno por cada Pull Request.
 
 Antes de publicar: `pnpm test:ci`, `pnpm build` y el
 [checklist de pruebas en celulares](docs/CHECKLIST-PRUEBAS.md).
