@@ -155,7 +155,7 @@
         <div class="space-y-3">
           <!-- Aviso de privacidad de ubicación -->
           <p class="font-body text-xs leading-relaxed" style="color: #888;">
-            📍 Usamos tu ubicación solo para calcular la distancia y el costo del delivery. No se guarda en ningún servidor.
+            📍 Usamos tu ubicación solo para calcular el costo del delivery y para que el repartidor llegue a tu dirección. Se envía al local en tu mensaje de WhatsApp y no la guardamos en ningún servidor.
           </p>
 
           <!-- Botón GPS -->
@@ -442,6 +442,11 @@
       </svg>
       Confirmar y Enviar por WhatsApp
     </button>
+
+    <!-- Aviso de privacidad general: visible para retiro y delivery -->
+    <p class="font-body text-xs leading-relaxed text-center mt-3" style="color: #888;">
+      🔒 Tus datos (nombre, teléfono y, si eliges delivery, dirección y ubicación) solo se usan para preparar y entregar tu pedido. Se envían al local por WhatsApp y no se guardan en ningún servidor.
+    </p>
 
     @if (whatsappFallbackUrl(); as url) {
       <div class="mt-3 rounded-xl p-3 space-y-2" style="background: #2A1B1B; border: 1px solid #5A2A2A;">

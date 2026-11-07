@@ -69,6 +69,7 @@ en Netlify (o en el *Deploy Preview* de la rama). Marca cada punto con `[x]`.
 - [ ] **Efectivo**: el monto se formatea ($20.000) y calcula el vuelto; un monto
       menor al total no deja enviar.
 - [ ] **Transferencia**: "Copiar datos" copia todo al portapapeles.
+- [ ] Bajo el botón de enviar se ve el aviso 🔒 de privacidad (en retiro y en delivery).
 
 ## 8. Envío por WhatsApp
 
