@@ -211,7 +211,8 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     permiteExtras: true,
     disponible: true,
     imagen: 'v1793552838/WhatsApp_Image_2026-11-01_at_2.05.50_PM.jpg',
-  },
+  }
+  /*
   {
     id: 24,
     categoria: 'BEBESTIBLE',
@@ -222,7 +223,7 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioOferta: null,
     precioCombo: 1000,
     permiteExtras: true,
-    disponible: true,
+    disponible: false,
     imagen: 'v1793553001/Gemini_Generated_Image_g9ac1eg9ac1eg9ac.jpg',
   },
   {
@@ -235,7 +236,8 @@ export const PRODUCTOS: readonly ProductoRecord[] = [
     precioOferta: null,
     precioCombo: 1000,
     permiteExtras: true,
-    disponible: true,
+    disponible: false,
     imagen: 'v1793553109/Gemini_Generated_Image_jxmt8qjxmt8qjxmt.jpg',
   },
+  */
 ];
