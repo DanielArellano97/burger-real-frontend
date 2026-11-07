@@ -29,6 +29,8 @@ envía como **mensaje de WhatsApp**. Pago por transferencia o efectivo (sin pasa
 - **Tailwind CSS v4** (`@tailwindcss/postcss`); tokens en `@theme` de `src/styles.css`.
 - **Angular CDK**: `Dialog` y `A11yModule`. **@lucide/angular** para íconos.
 - **Cloudinary** para imágenes (loader propio). **Vitest** vía `ng test`.
+- Fuentes **autoalojadas** con `@fontsource` (Bebas Neue, Barlow Condensed, Inter; subset latin),
+  declaradas en `angular.json > styles`. Sin Google Fonts: no agregar `<link>` externos.
 - **pnpm 11.5.2**, Node 22.22.3+. Hosting **Netlify** (`netlify.toml`).
 - No se usa: SpartanUI, Angular Material, `@angular/animations` (animaciones en CSS),
   Reactive Forms, `HttpClient` (aún).

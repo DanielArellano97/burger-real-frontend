@@ -59,6 +59,6 @@
     # Solo se usa la ubicación (delivery); el resto de APIs sensibles queda bloqueado.
     Permissions-Policy = "geolocation=(self), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains"
-    # CSP: solo se cargan scripts propios; imágenes de Cloudinary; fuentes de Google.
+    # CSP: scripts, estilos y fuentes propios (fuentes alojadas en el sitio); imágenes de Cloudinary.
     # Si se conecta un backend, agregar su dominio a connect-src.
-    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://res.cloudinary.com; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://res.cloudinary.com; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"

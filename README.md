@@ -164,7 +164,7 @@ muestre la foto (tamaño exacto, AVIF/WebP y recorte inteligente).
 ## 🔒 Seguridad
 
 - **Cabeceras** (`netlify.toml`): CSP estricta (solo scripts propios, imágenes de
-  Cloudinary, fuentes de Google), HSTS, `X-Frame-Options: DENY`, `nosniff` y
+  Cloudinary, fuentes alojadas en el propio sitio), HSTS, `X-Frame-Options: DENY`, `nosniff` y
   `Permissions-Policy` (solo geolocalización).
 - **Carrito sin precios**: el navegador guarda solo ids y cantidades. Los precios se
   recalculan desde el menú, así que editar el `localStorage` no cambia lo que se cobra.
